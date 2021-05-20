@@ -13,6 +13,7 @@ mov bp, 0x9000
 mov sp, bp
 
 call load_kernel
+call do_e820
 call a20_gate_fast
 call switch_to_32bit
 
@@ -23,6 +24,7 @@ jmp $
 %include "switch.asm"
 %include "msgutil.asm"
 %include "a20.asm"
+%include "E820mem.asm"
 
 [bits 16]
 load_kernel:
@@ -34,7 +36,7 @@ load_kernel:
 
 [bits 32]
 BEGIN_32BIT:
-    ;call KERNEL_OFFSET ; give control to the kernel
+    call KERNEL_OFFSET ; give control to the kernel
     jmp $ ; loop in case kernel returns
 
 ; boot drive variable
