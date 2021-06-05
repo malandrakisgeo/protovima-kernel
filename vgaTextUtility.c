@@ -1,8 +1,5 @@
-
-int xPos = 0;
-int yPos = 0;
-#define MaxYInitial 25
-#define MaxXInitial 80
+unsigned int xPos = 0;
+unsigned int yPos = 0;
 
 /*
 16 bit video buffer elements(register ax)
@@ -13,6 +10,13 @@ int yPos = 0;
 8 bits(al) lower :
   8 bits : ASCII character to print
 */
+
+
+
+
+
+
+
 uint16 vga_entry(unsigned char ch, uint8 fore_color, uint8 back_color) 
 {
   uint16 ax = 0;
@@ -38,15 +42,95 @@ void clear_vga_buffer(uint16 **buffer, uint8 fore_color, uint8 back_color)
   }
 }
 
+//initialize vga buffer
+void init_vga(uint8 fore_color, uint8 back_color)
+{
+   xPos = 0;
+   yPos = 0;
+  vga_buffer = (uint16*)VGA_ADDRESS;  //point vga_buffer pointer to VGA_ADDRESS 
+  clear_vga_buffer(&vga_buffer, fore_color, back_color);  //clear buffer
+}
 
+
+/**
+ * hex2int
+ * take a hex string and convert it to a 32bit number (max 8 hex digits)
+ */
+/*int hex2int(char *hex) {
+    int val = 0;
+    while (*hex) {
+        // get current character then increment
+        int byte = *hex++; 
+        // transform hex character to the 4bit equivalent number, using the ascii table indexes
+        if (byte >= '0' && byte <= '9') byte = byte - '0';
+        else if (byte >= 'a' && byte <='f') byte = byte - 'a' + 10;
+        else if (byte >= 'A' && byte <='F') byte = byte - 'A' + 10;    
+        // shift 4 to make space for new digit, and add the 4 bits of the new digit 
+        val = (val << 4) | (byte & 0xF);
+    }
+    return val;
+} */
+
+
+unsigned char *itoa( unsigned short value, unsigned char * str, unsigned int base )
+{
+    unsigned char * rc;
+    unsigned char * ptr;
+    unsigned char * low;
+    // Check for supported base.
+    if ( base < 2 || base > 36 )
+    {
+        *str = '\0';
+        return str;
+    }
+    rc = ptr = str;
+    // Set '-' for negative decimals.
+    if ( value < 0 && base == 10 )
+    {
+        *ptr++ = '-';
+    }
+    // Remember where the numbers start.
+    low = ptr;
+    // The actual conversion.
+    do
+    {
+        // Modulo is negative for negative value. This trick makes abs() unnecessary.
+        *ptr++ = "zyxwvutsrqponmlkjihgfedcba9876543210123456789abcdefghijklmnopqrstuvwxyz"[35 + value % base];
+        value /= base;
+    } while ( value );
+    // Terminating the string.
+    *ptr-- = '\0';
+    // Invert the numbers.
+    while ( low < ptr )
+    {
+        unsigned char tmp = *low;
+        *low++ = *ptr;
+        *ptr-- = tmp;
+    }
+    return rc;
+}
+/*
+char* itoa2(int val, int base){
+	
+	static char buf[32] = {0};
+	
+	int i = 30;
+	
+	for(; val && i ; --i, val /= base)
+	
+		buf[i] = "0123456789abcdef"[val % base];
+	
+	return &buf[i+1];
+	
+}
+*/
 
 //
-void printlnVGA(char *msg){
-    //vga_buffer[xPos] = vga_entry('\n', WHITE, BLACK);
+void printlnVGA(unsigned char *msg){
 
-  int i=0;
+  unsigned int i=0;
   while(msg[i] != NULL){
-    vga_buffer[xPos] = vga_entry(msg[i], WHITE, BLACK);
+    vga_buffer[xPos] = vga_entry(msg[i], BRIGHT_GREEN, BLACK);
     i++;
     xPos++;
   }
@@ -54,3 +138,14 @@ void printlnVGA(char *msg){
   yPos++;
 }
 
+void printchVGA(unsigned char *msg){
+
+  unsigned int i=0;
+  while(msg[i] != NULL){
+    vga_buffer[xPos] = vga_entry(msg[i], BRIGHT_GREEN, BLACK);
+    i++;
+    xPos++;
+  }
+  xPos += ( i);
+  yPos++;
+}

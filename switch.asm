@@ -5,7 +5,9 @@ switch_to_32bit:
     mov eax, cr0
     or eax, 0x1             ; 3. enable protected mode
     mov cr0, eax
-    jmp CODE_SEG:init_32bit ; 4. far jump
+    jmp CODE_SEG:init_32bit ; 4. far jump.  GIA V1
+    ;jmp init_32bit ;GIA V2&v3
+    ;call 0x1000
 
 [bits 32]
 init_32bit:
@@ -19,4 +21,9 @@ init_32bit:
     mov ebp, 0x90000        ; 6. setup stack
     mov esp, ebp
 
-    call BEGIN_32BIT        ; 7. move back to mbr.asm 
+    ;call main        ; 7. move back to a.asm 
+    call 0x9000
+    cli
+    loopend:                ;Infinite loop when finished
+        hlt
+        jmp loopend ;v3

@@ -1,12 +1,16 @@
+
+ [bits 16]
+
 ; Source: https://wiki.osdev.org/Detecting_Memory_(x86)#Getting_an_E820_Memory_Map
 ; use the INT 0x15, eax= 0xE820 BIOS function to get a memory map
 ; note: initially di is 0, be sure to set it to a value so that the BIOS code will not be overwritten. 
 ;       The consequence of overwriting the BIOS code will lead to problems like getting stuck in `int 0x15`
 ; inputs: es:di -> destination buffer for 24 byte entries
 ; outputs: bp = entry count, trashes all registers except esi
-mmap_ent equ 0x7000             ; the number of entries will be stored at 0x7000
-do_e820:
-        mov di, 0x8004          ; Set di to 0x8004. Otherwise this code will get stuck in `int 0x15` after some entries are fetched 
+mmap_ent equ 0x6500             ; the number of entries will be stored at 0x8000
+ do_e820:
+	pusha
+	mov di, 0x8004        ; Set di to 0x8004. Otherwise this code will get stuck in `int 0x15` after some entries are fetched 
 	xor ebx, ebx		; ebx must be 0 to start
 	xor bp, bp		; keep an entry count in bp
 	mov edx, 0x0534D4150	; Place "SMAP" into edx
@@ -43,10 +47,28 @@ do_e820:
 .skipent:
 	test ebx, ebx		; if ebx resets to 0, list is complete
 	jne short .e820lp
+	je short .e820f
 .e820f:
 	mov [mmap_ent], bp	; store the entry count
+    xor ax,ax
+    mov ah, 0x0e
+    mov si, bp
+	call printmsg
 	clc			; there is "jc" on end of list to this point, so the carry must be cleared
+	popa
 	ret
 .failed:
 	stc			; "function unsupported" error exit
     ret
+
+; H telikh thesh mnhmhs  eksartatai apo to stacktop. Etsi, gia stacktop (ss)
+; sto 0x7c00, an apothikeusoume gia 0x1c00, katalhgei sth thesh mnhmhs
+; 0x9800
+;   0x7c00*16  AND 0x6500  = 0x82500;
+; 	0x07c0*16 AND 0x6500  0xE100
+;	0x07c0*16 +	0x8004   0xFC04      + 0X6500 = 0x16104
+;
+;  0x07c0*16 and 0x1c00 = 0x9800
+;  0x07c0*16 + 0x1000    0x8C00
+;
+;

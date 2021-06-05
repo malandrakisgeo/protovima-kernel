@@ -1,4 +1,4 @@
-    
+     [bits 16]
 ;section .text    
 a20_gate_fast: 
     xor ax,ax
@@ -10,18 +10,20 @@ a20_gate_fast:
     xchg bx, bx
     cmp  ax, 0
     jne  enable_A20__done ;jump if A20 enabled
-    mov si,A20errorMsg
-    call printmsg
+    ;mov si,A20errorMsg
+    ;call printmsg
+        mov bx , ERROR_MSG  ;v3
+    call print_string  ;v3
     call a20_gate_fast
     
 
 ;section .text
 enable_A20__done: 
     xor ax,ax
-    mov ah, 0x0e
-    mov si, A20success
-    mov al, [si]
-    call printmsg
+    ;mov ah, 0x0e
+    ;mov si, A20success
+   ; mov al, [si]
+    ;call printmsg
     ret
     ;jmp printmsg ;HERE
     ;jmp load_gdt

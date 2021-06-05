@@ -7,32 +7,25 @@
 
 #include "kernel.h"
 #include "vgaTextUtility.c"
+#include "memoryManager.c"
 
-
-
-
-//initialize vga buffer
-void init_vga(uint8 fore_color, uint8 back_color)
-{
-  vga_buffer = (uint16*)VGA_ADDRESS;  //point vga_buffer pointer to VGA_ADDRESS 
-  clear_vga_buffer(&vga_buffer, fore_color, back_color);  //clear buffer
-}
-
-
+/* This code will be placed at the beginning of the object by the linker script */    
+ __asm__ (".pushsection .text.start\r\n" \
+         "jmp main\r\n" \
+         ".popsection\r\n"
+         );
 
 
 
 void main(){
-    char * video_memory = (char *) VGA_ADDRESS;
+    unsigned char * video_memory = (unsigned char *) VGA_ADDRESS;
     init_vga(WHITE, BLACK);
     
-    int* memaddress = (int *)0x7000; 
+    unsigned int * memaddress = (unsigned int *)0x7000; 
     //char *address = (char *)0x7000;
-    char myString[] = "Hello world";
-    char myStringg[] = "new line";
+    unsigned char myString[] = "Kernel running";
     printlnVGA(myString);
-    printlnVGA(myStringg);
-
+    showAvailableMemory();
     //kernel_entry();
     for(;;) {}  
 }
