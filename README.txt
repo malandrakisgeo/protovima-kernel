@@ -1,4 +1,4 @@
-My first step in kernel programming. 
+My first step in kernel programming. More of a playground than an actual project.
 
 Goal: an OS providing a simple shell with some basic commands. 
 
