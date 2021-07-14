@@ -25,7 +25,11 @@ void main(){
     //char *address = (char *)0x7000;
     unsigned char myString[] = "Kernel running";
     printlnVGA(myString);
-    showAvailableMemory();
+    unsigned char myString2[] = "1b";
+    printlnVGA(myString2);
+    //showAvailableMemory();
+    
+    showHex();
     //kernel_entry();
     for(;;) {}  
 }

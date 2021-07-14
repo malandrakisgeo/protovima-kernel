@@ -1,14 +1,15 @@
 
  [bits 16]
- 
+
 global do_e820
+
 ; Source: https://wiki.osdev.org/Detecting_Memory_(x86)#Getting_an_E820_Memory_Map
 ; use the INT 0x15, eax= 0xE820 BIOS function to get a memory map
 ; note: initially di is 0, be sure to set it to a value so that the BIOS code will not be overwritten. 
 ;       The consequence of overwriting the BIOS code will lead to problems like getting stuck in `int 0x15`
 ; inputs: es:di -> destination buffer for 24 byte entries
 ; outputs: bp = entry count, trashes all registers except esi
-mmap_ent equ 0x6500             ; the number of entries will be stored at 0x8000
+mmap_ent equ 0x00000dfd0             ; the number of entries will be stored at 0x8000
  do_e820:
 	pusha
 	mov di, 0x8004        ; Set di to 0x8004. Otherwise this code will get stuck in `int 0x15` after some entries are fetched 
@@ -50,11 +51,11 @@ mmap_ent equ 0x6500             ; the number of entries will be stored at 0x8000
 	jne short .e820lp
 	je short .e820f
 .e820f:
-	mov [mmap_ent], bp	; store the entry count
+	mov  [dword mmap_ent], bp	; store the entry count
     xor ax,ax
-    mov ah, 0x0e
-    mov si, bp
-	call printmsg
+    ;mov ah, 0x0e
+    ;mov si, bp
+	;call printmsg
 	clc			; there is "jc" on end of list to this point, so the carry must be cleared
 	popa
 	ret

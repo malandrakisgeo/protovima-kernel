@@ -15,7 +15,7 @@ dd if=/dev/zero of=disk.img bs=512 count=2880  ##prosoxh sto dh
 dd if=boot.bin of=disk.img bs=512 conv=notrunc
 dd if=kernel.bin of=disk.img bs=512 seek=1 conv=notrunc
 
-qemu-system-i386 -fda disk.img
+qemu-system-i386 -m 3G -fda disk.img
 
 #qemu-system-i386 -fda disk.img -S -s 
 

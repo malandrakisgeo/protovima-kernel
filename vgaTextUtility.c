@@ -126,10 +126,31 @@ char* itoa2(int val, int base){
 */
 
 //
+
+strlen(const char *str) //BSD implementation
+{
+        const char *s;
+
+        for (s = str; *s; ++s)
+                ;
+        return (s - str);
+}
+
+println(unsigned char *text){
+  int i, l;
+  for (i = 0; i < strlen(text); i++)//You know strlen(String length)
+    {
+      vga_buffer[xPos] = vga_entry(text[i], BRIGHT_GREEN, BLACK);
+      xPos++;
+    }
+  xPos += ( MaxXInitial - strlen(text));
+  yPos++;
+}
+
 void printlnVGA(unsigned char *msg){
 
   unsigned int i=0;
-  while(msg[i] != NULL){
+  while(msg[i] != NULL  && msg[i] !='0x00'){
     vga_buffer[xPos] = vga_entry(msg[i], BRIGHT_GREEN, BLACK);
     i++;
     xPos++;
@@ -141,7 +162,7 @@ void printlnVGA(unsigned char *msg){
 void printchVGA(unsigned char *msg){
 
   unsigned int i=0;
-  while(msg[i] != NULL){
+  while(msg[i] != NULL && msg[i] !='00'){
     vga_buffer[xPos] = vga_entry(msg[i], BRIGHT_GREEN, BLACK);
     i++;
     xPos++;

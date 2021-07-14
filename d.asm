@@ -13,15 +13,21 @@ _start:
                         ; 17*512 allows for a kernel.bin up to 8704 bytes
     mov bx, 0x9000      ; Load Kernel to ES:BX = 0x0000:0x9000
 
-    call load_kernel
     call a20_gate_fast
+    push es
     call do_e820;
+    pop es
+
+    mov eax, [ERROR_MSG] ;;;AUTO!!! ELEIPAN TA [] OPOTE APLA EGRAFE THESEIS MNHMHS!!!
+    mov dword [dword 0x00000dd00], eax 
+    mov  [ 0x1c00], eax
+    call load_kernel
 
 ;   call graphics_mode  ; Uncomment if you want to switch to graphics mode 0x13
     lgdt [gdt_descriptor]
     mov eax, cr0
     or al, 1
-    mov cr0, eax
+    mov cr0, eax    
     jmp dword CODE_SEG:init_pm
 
 graphics_mode:
@@ -96,7 +102,7 @@ loopend:
 
 [bits 16]
 ; Variables
-ERROR            db "A20 Error!" , 0
+ERROR            db "bbb!" , 0
 ERROR_MSG        db "Error!" , 0
 BOOT_DRIVE:      db 0
 
@@ -106,6 +112,7 @@ WHITE_ON_BLACK   equ 0x0f
 %include "a20.asm"
 %include "gdt.asm"
 %include "e8202.asm"
+;%include "E820mem.asm"
 
 times 510-($-$$) db 0
 db 0x55

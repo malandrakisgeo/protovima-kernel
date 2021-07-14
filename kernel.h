@@ -18,14 +18,16 @@ typedef unsigned long long ulong64;
 #define VADDR(pa)	((pa) + KERNEL_BASE*16)
 #define VADDR2(pa)	((pa) + KERNEL_BASE)
 #define NULL 0
-
+#define E820_TYPE_FREE		1
+#define PGSIZE	0x1000
 
  typedef struct memoryMapEntry{
-    ulong64 baseLow; //unsigned long long equivalent
-    ulong64 baseHigh;
-    ulong32 length;   
-    ulong32 type;
-    ulong32 acpi_null; 
+    uint32 baseLow; 
+    uint32 baseHigh;
+    uint32 length;
+    unsigned int length_high;   
+    uint32 type;
+    uint32 acpi_null; 
     } memoryMapEntry; 
 
 /*typedef struct memoryMapEntry{
@@ -40,6 +42,22 @@ struct boot_param {
 	struct memoryMapEntry memMapp[128];
 	unsigned int e820_num;
 };
+
+
+struct e820_entry {
+	unsigned int addr;
+	unsigned int addr_high;
+	unsigned int length;
+	unsigned int length_high;
+	unsigned int type;
+	unsigned int pad;
+};
+
+struct boot_paranm {
+	struct e820_entry e820_list[128];
+	unsigned int e820_num;
+};
+
 
 uint16* vga_buffer;
 
@@ -65,3 +83,20 @@ enum vga_color {
 
 #endif
  
+#ifndef COMMON_H
+#define COMMON_H
+
+// Some nice typedefs, to standardise sizes across platforms.
+// These typedefs are written for 32-bit X86.
+typedef unsigned int   u32int;
+typedef          int   s32int;
+typedef unsigned short u16int;
+typedef          short s16int;
+typedef unsigned char  u8int;
+typedef          char  s8int;
+
+void outb(u16int port, u8int value);
+u8int inb(u16int port);
+u16int inw(u16int port);
+
+#endif
