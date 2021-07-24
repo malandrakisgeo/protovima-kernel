@@ -1,3 +1,6 @@
+#ifndef TYPES_H
+#define TYPES_H
+
 struct SMAP_entry{
 	uint32 BaseL; // base address uint64_t
 	uint32 BaseH;

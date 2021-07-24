@@ -1,38 +1,57 @@
- rm *.bin  *.o os-image
-#assemble boot.s file
-nasm a.asm -f bin  -o boot.o
-#nasm mem.asm -f bin  -o boott.o #to binary einai polu pio euanagnwsto meta apo objdump se sxesh me to elf (150 vs 550 grammes)
+#old way:
+#rm *.bin  *.o  *.elf  disk.img os-image
 
-#nasm memsimplified.asm   -o e8202.o
+#nasm -g -f elf32 -F dwarf -o boot.o d.asm
+#ld -melf_i386 -Ttext=0x7c00 -nostdlib --nmagic -o boot.elf boot.o
+#objcopy -O binary boot.elf boot.bin
 
-nasm  jmptokernel.asm -f elf -o kerneljump.o
+#gcc -g -m32 -c -ffreestanding -o kernel.o kernel.c -lgcc
+#ld -melf_i386 -T linker.ld -nostdlib --nmagic -o kernel.elf kernel.o
+#objcopy -O binary kernel.elf kernel.bin
 
-#nasm  E820mem.asm -f elf -o e820.o
-#gcc TEST.c -S to view .S
-#objdump -D -Mintel,i386 -b binary -m i386 kernel.o > kernel.txt
-#objdump -D -Mintel,i386 -b binary -m i386 os-image > os2.txt
 
-gcc -m32 -c  -fno-builtin -nostdinc -nostdlib -ffreestanding  kernel.c  -o kernel.o
-#gcc -Wall -Wcast-align -m32 -c -ffreestanding  kernel.c  -o kernel.o
 
-#gcc  fno-plt -m32  -ffreestanding   kernel.c e8202.o -o kernel.o #to -c den endeiknuetai gia linking me .o
+#dd if=/dev/zero of=disk.img bs=512 count=2880  ##prosoxh sto dh 
+#dd if=boot.bin of=disk.img bs=512 conv=notrunc
+#dd if=kernel.bin of=disk.img bs=512 seek=1 conv=notrunc
 
-ld -melf_i386 -Ttext 0x1000  -o kernel.bin  kerneljump.o kernel.o --oformat binary
+#qemu-system-i386  -smp 4  -m 50M,maxmem=50M disk.img
 
-#ld -melf_i386 -N -Ttext 0x1000  -o kernel.bin  kerneljump.o kernel.o --oformat binary
-# ld -melf_i386 -N -Ttext 0x1000  -o freestanding.bin  freestanding.o --oformat binary
+#qemu-system-i386 -m 1G,maxmem=20030M -fda disk.img
 
-cat boot.o kernel.bin > os-image
+--------------------------
 
-#qemu-system-i386  -fda os-image
-#qemu-system-i386 -m 1G  os-image  -serial file:serial.log
-qemu-system-i386 -D log.log -d cpu_reset -qmp tcp:localhost:4444,server,nowait -m 500M  os-image 
+#new way: 
 
+
+make clean
+make all 
+qemu-system-i386 -m 3G -fda os.img
+
+
+## DEBUG METHOD 1: 
+#gdb kernel.elf  \
+#       -ex 'target remote localhost:1234' \
+##        -ex 'layout src' \
+#        -ex 'layout reg' \
+#        -ex 'break main' \
+#        -ex 'continue'
+
+
+##DEBUG METHOD 2:
 #telnet localhost 4444
 # { "execute": "qmp_capabilities" }
 # { "execute": "query-commands" }
 # {"execute":"dump-guest-memory","arguments":{"paging":false,"protocol":"file:/home/guest-memory","format":"elf"}}
-# {"execute":"dump-guest-memory","arguments":{"paging":false,"protocol":"file:/home/guest-membin","format":"binary"}}
-#hexedit guest-memory > readable.txt
-#xxd file > file.hex
-#diff  best820-yes.txt best820-no.txt > differenceF.txt
+# ENAL. {"execute":"dump-guest-memory","arguments":{"paging":false,"protocol":"file:/home/guest-membin","format":"binary"}}
+#hexedit guest-memory > readable-hex.txt
+#enal.  xxd file > file.hex
+#diff  hexfile1.txt hexfile2.txt > differenceF.txt
+#diff  kernel-without.elf kernel.elf > differenceF.txt
+##USEFUL LINKS: 
+
+#https://forum.osdev.org/viewtopic.php?f=1&t=33512
+
+#https://stackoverflow.com/questions/19548852/ld-error-in-eh-frame-no-eh-frame-hdr-table-will-be-create
+
+#https://stackoverflow.com/questions/33603842/how-to-make-the-kernel-for-my-bootloader

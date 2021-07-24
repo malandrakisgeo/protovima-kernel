@@ -1,30 +1,10 @@
-ENTRY (loader)
+OUTPUT_FORMAT(elf32-i386)
+ENTRY(main)
 
-SECTIONS {
-    . = 0x100000;
-    
-    kernel_start = .;
-    
-    .mbheader : {
-        *(.mbheader)
-    }
-
-    .text : {
-        *(.text)
-    }
-
-    .rodata ALIGN (0x1000) : {
-        *(.rodata)
-    }
-
-    .data ALIGN (0x1000) : {
-        *(.data)
-    }
-
-    .bss ALIGN (0x1000) : {
-        *(COMMON)
-        *(.bss)
-    }
-    
-    kernel_end = .;
+SECTIONS
+{
+    . = 0x9000;
+    .text : { *(.text.start) *(.text) }
+    .data : { *(.data) }
+    .bss  : { *(.bss) *(COMMON) }
 }

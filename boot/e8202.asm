@@ -2,21 +2,20 @@
 
 global do_e820
 
-mmap_ent equ 0x1c00   
  do_e820:
-
     pushad
 	xor ax,ax
-	mov ax, 0x07c0
+	;mov ax, 0x0000
 	mov es,ax
     xor ebp, ebp			;/* entry number */
     xor ebx, ebx		;	/* ebx must be 0 to start */
     ;mov edi, 0x1000		;/* e820 list(es:edi 0x07c0:0x1000) */  0x07c0*16 + 0x1000
 	;mov edi,  0xeb00	;/* e820 list(es:edi 0x0000:0xeb00) */  0xeb000  ;TODO: VRES GIATI DEN DOUPEVE
-	mov edi, 0x1000 ; es:edi 0x07c0:0x1000    
+	mov edi, 0x00000B00 ; es:edi 0x07c0:0x1000     H 0x0000:0xA000 K.O.K
 .loopy_e820:
 	mov edx, 0x0534D4150		;/* magical number: "SMAP" */
 	mov eax, 0xe820
+	mov dword [es:di + 20], 1 ; Force a valid ACPI 3.X entry
 	mov ecx, 24
 	int 0x15
 	jc short .end_e820
@@ -35,18 +34,10 @@ mmap_ent equ 0x1c00
 .end_e820:
 	cmp eax, 0x01		;/* entry number <= 1 for error */
 	je short .fail_e820
-	mov  [ 0x00000dfd0], ebp ;how many entries
 	xor eax, eax
-	mov eax, es:0xeb00
-	mov  [0x000002fd0],eax
-	;mov [mmap_ent], eax
-    ;mov ah, 0x0e
-    ;mov esi, ebp
-	;call printmsg
-	 ; mov eax, strMuf
-	;mov [mmap_ent], eax	;/* save e820 entry number to 0x9800 */ ;  0x07c0*16 and 0x1c00 = 0x9800
-	xor ebp,ebp
-    xor edi,edi
+	mov  [ 0x00000dfd0], ebp ;how many entries
+	mov eax, es:edi
+	;mov  [0x000002fd0],eax
     popad
     ret
 .fail_e820:

@@ -11,40 +11,22 @@ typedef unsigned long long ulong64;
 #define MaxXInitial 80
 
 #define VGA_ADDRESS 0xB8000
-#define E820_ADDRESS 0x8c00 //0x82500   0xE100     0xFC04    0x16104 0x8c00
+#define VGA_ORIGINAL 0xB8000
+#define E820_ADDRESS 0x0A000 //0x82500   0xE100     0xFC04    0x16104 0x8c00
+#define E820_ADDRESS2	((void *)VADDR(E820_ADDRESS))
+#define E820_ADDRESS5 0x00000dfd0 
+#define E820_ADDRESS4 0x1000
 #define BUFSIZE 2200
-#define KERNEL_BASE	0x1000
+#define KERNEL_BASE	0x10000
 
-#define VADDR(pa)	((pa) + KERNEL_BASE*16)
-#define VADDR2(pa)	((pa) + KERNEL_BASE)
+
+#define VADDR(pa)	((pa) + KERNEL_BASE)
 #define NULL 0
 #define E820_TYPE_FREE		1
 #define PGSIZE	0x1000
+#define VGA_ADDRESS2	((void *)VADDR(VGA_ORIGINAL))
 
- typedef struct memoryMapEntry{
-    uint32 baseLow; 
-    uint32 baseHigh;
-    uint32 length;
-    unsigned int length_high;   
-    uint32 type;
-    uint32 acpi_null; 
-    } memoryMapEntry; 
-
-/*typedef struct memoryMapEntry{
-    unsigned int baseLow; //unsigned long long equivalent
-    unsigned int baseHigh;
-    unsigned int length;   
-    unsigned int type;
-    unsigned int acpi_null; 
-    } memoryMapEntry;  */
-
-struct boot_param {
-	struct memoryMapEntry memMapp[128];
-	unsigned int e820_num;
-};
-
-
-struct e820_entry {
+typedef struct e820_entry {
 	unsigned int addr;
 	unsigned int addr_high;
 	unsigned int length;
@@ -53,13 +35,10 @@ struct e820_entry {
 	unsigned int pad;
 };
 
-struct boot_paranm {
-	struct e820_entry e820_list[128];
-	unsigned int e820_num;
+struct boot_param {
+	struct e820_entry memMapp[128];
+	unsigned long e820_num;
 };
-
-
-uint16* vga_buffer;
 
 
 enum vga_color {

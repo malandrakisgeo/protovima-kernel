@@ -1,3 +1,6 @@
+#include "kernel.h"
+uint16* vga_buffer;
+
 unsigned int xPos = 0;
 unsigned int yPos = 0;
 
@@ -14,11 +17,9 @@ unsigned int yPos = 0;
 
 
 
-
-
-
 uint16 vga_entry(unsigned char ch, uint8 fore_color, uint8 back_color) 
 {
+  uint32 eax = 0;
   uint16 ax = 0;
   uint8 ah = 0, al = 0;
 
@@ -30,13 +31,15 @@ uint16 vga_entry(unsigned char ch, uint8 fore_color, uint8 back_color)
   al = ch;
   ax |= al;
 
+  eax |= ax;
+  eax <<= 16;
   return ax;
 }
 
 //clear video buffer array
 void clear_vga_buffer(uint16 **buffer, uint8 fore_color, uint8 back_color)
 {
-  uint32 i;
+  uint16 i;
   for(i = 0; i < BUFSIZE; i++){
     (*buffer)[i] = vga_entry(NULL, fore_color, back_color);
   }
@@ -47,32 +50,13 @@ void init_vga(uint8 fore_color, uint8 back_color)
 {
    xPos = 0;
    yPos = 0;
-  vga_buffer = (uint16*)VGA_ADDRESS;  //point vga_buffer pointer to VGA_ADDRESS 
+  vga_buffer = (uint16*)(VGA_ADDRESS);  //point vga_buffer pointer to VGA_ADDRESS 
   clear_vga_buffer(&vga_buffer, fore_color, back_color);  //clear buffer
 }
 
 
-/**
- * hex2int
- * take a hex string and convert it to a 32bit number (max 8 hex digits)
- */
-/*int hex2int(char *hex) {
-    int val = 0;
-    while (*hex) {
-        // get current character then increment
-        int byte = *hex++; 
-        // transform hex character to the 4bit equivalent number, using the ascii table indexes
-        if (byte >= '0' && byte <= '9') byte = byte - '0';
-        else if (byte >= 'a' && byte <='f') byte = byte - 'a' + 10;
-        else if (byte >= 'A' && byte <='F') byte = byte - 'A' + 10;    
-        // shift 4 to make space for new digit, and add the 4 bits of the new digit 
-        val = (val << 4) | (byte & 0xF);
-    }
-    return val;
-} */
 
-
-unsigned char *itoa( unsigned short value, unsigned char * str, unsigned int base )
+unsigned char *itoa( unsigned long value, unsigned char * str, unsigned int base )
 {
     unsigned char * rc;
     unsigned char * ptr;
@@ -109,23 +93,6 @@ unsigned char *itoa( unsigned short value, unsigned char * str, unsigned int bas
     }
     return rc;
 }
-/*
-char* itoa2(int val, int base){
-	
-	static char buf[32] = {0};
-	
-	int i = 30;
-	
-	for(; val && i ; --i, val /= base)
-	
-		buf[i] = "0123456789abcdef"[val % base];
-	
-	return &buf[i+1];
-	
-}
-*/
-
-//
 
 strlen(const char *str) //BSD implementation
 {
@@ -138,7 +105,7 @@ strlen(const char *str) //BSD implementation
 
 println(unsigned char *text){
   int i, l;
-  for (i = 0; i < strlen(text); i++)//You know strlen(String length)
+  for (i = 0; i < strlen(text); i++)
     {
       vga_buffer[xPos] = vga_entry(text[i], BRIGHT_GREEN, BLACK);
       xPos++;
@@ -169,4 +136,22 @@ void printchVGA(unsigned char *msg){
   }
   xPos += ( i);
   yPos++;
+}
+
+void writechar(unsigned char c, unsigned char forecolour, unsigned char backcolour, int x, int y)
+{
+     uint16 attrib = (backcolour << 4) | (forecolour & 0x0F);
+     volatile uint16 * where;
+     where = (volatile uint16 *)0xB8000 + (y * 80 + x) ;
+     *where = c | (attrib << 8);
+}
+
+void writeline(unsigned char *msg)
+{
+  int x=0;
+  int y=1;
+     while(msg[x] != NULL && msg[x] !='00'){
+       writechar(&msg[x], BRIGHT_GREEN, BLACK, x, y);
+       ++x;
+     }
 }

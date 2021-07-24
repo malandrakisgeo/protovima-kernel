@@ -1,4 +1,5 @@
 [bits 16]
+[org 0x7c00]
 
 global _start
 _start:
@@ -7,33 +8,27 @@ _start:
     mov ds, ax
     mov es, ax
     mov ss, ax
-    mov sp, 0x8000      ; Stack pointer at SS:SP = 0x0000:0x8000
+    mov sp, MEM_POS 
+    mov ax, ERROR_MSG2
     mov [BOOT_DRIVE], dl; Boot drive passed to us by the BIOS
-    mov dh, 17        ; Number of sectors (kernel.bin) to read from disk
+    mov dh, 12        ; Number of sectors (kernel.bin) to read from disk
                         ; 17*512 allows for a kernel.bin up to 8704 bytes
-    mov bx, 0x9000      ; Load Kernel to ES:BX = 0x0000:0x9000
-
-    call a20_gate_fast
-    push es
-    call do_e820;
-    pop es
-
-    mov eax, [ERROR_MSG] ;;;AUTO!!! ELEIPAN TA [] OPOTE APLA EGRAFE THESEIS MNHMHS!!!
-    mov dword [dword 0x00000dd00], eax 
-    mov  [ 0x1c00], eax
+    mov bx, MEM_POS      ; Load Kernel to ES:BX = 0x0000:0x9000  or 0x0000:0xA000 or.... 
     call load_kernel
 
-;   call graphics_mode  ; Uncomment if you want to switch to graphics mode 0x13
+    call a20_gate_fast
+    ;push es
+    call do_e820;
+    ;pop es
+    cli
+    xor eax,eax
     lgdt [gdt_descriptor]
     mov eax, cr0
-    or al, 1
+    or eax, 1
     mov cr0, eax    
     jmp dword CODE_SEG:init_pm
 
-graphics_mode:
-    mov ax, 0013h
-    int 10h
-    ret
+
 
 load_kernel:
                         ; load DH sectors to ES:BX from drive DL
@@ -53,7 +48,7 @@ load_kernel:
     jne disk_error      ; display error message
     ret
 disk_error :
-    mov bx , ERROR_MSG
+    mov bx , ERROR_MSG2
     call print_string
     hlt
 
@@ -91,10 +86,10 @@ init_pm:
     mov fs, ax
     mov gs, ax
 
-    mov ebp, 0x90000
+    mov ebp, MEM_POS
     mov esp, ebp
 
-    call dword 0x9000
+    call dword MEM_POS
     cli
 loopend:           
     hlt
@@ -102,17 +97,20 @@ loopend:
 
 [bits 16]
 ; Variables
-ERROR            db "bbb!" , 0
 ERROR_MSG        db "Error!" , 0
+ERROR_MSG2        db "44" , 0
+
 BOOT_DRIVE:      db 0
 
 VIDEO_MEMORY_SEG equ 0xb800
 WHITE_ON_BLACK   equ 0x0f
+MEM_POS equ 0x1000 ;;An to allakseis kai katalhsei sto gamo tou karagkiozh, 
+;tha emfanizontai mono prokathorismenes times sta println. Toutestin, mono o,ti exei 
+;mpei apo ton compiler sto stack, kai oxi o,ti tha evgaine sto runtime
 
 %include "a20.asm"
 %include "gdt.asm"
 %include "e8202.asm"
-;%include "E820mem.asm"
 
 times 510-($-$$) db 0
 db 0x55
