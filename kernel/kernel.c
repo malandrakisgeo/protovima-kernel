@@ -8,11 +8,12 @@
 #include "kernel.h"
 
 
-/* This code will be placed at the beginning of the object by the linker script  */  
+/* Written for the older version of PROTOVIMA. 
+    This code will be placed at the beginning of the object by the linker script   
  __asm__ (".pushsection .text.start\r\n" \
          "jmp main\r\n" \
          ".popsection\r\n"
-         ); 
+         );  */
 
 
 

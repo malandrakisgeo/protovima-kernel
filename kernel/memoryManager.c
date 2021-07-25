@@ -76,11 +76,10 @@ int content = *pcontent;
 	}
 	/* caculate the number of memory pages */
 	npage = memory_end / PGSIZE;
-  //printlnVGA(itoa(npage, ' d', 10));
 
   unsigned char *str; 
   str = itoa(npage * 4 / 1024, str, 10); //page in mbs
-        printlnVGA(str);
+  printlnVGA(str);
 
   return;
 }
