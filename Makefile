@@ -1,10 +1,11 @@
 # Automatically generate lists of sources using wildcards
-C_SOURCES = $(wildcard kernel/*.c)
+C_SOURCES = $(wildcard kernel/*.c kernel/*/*.c)
 INC_DIR = .
 # The option -ffreestanding directs the compiler 
 # to not assume that standard functions 
 # have their usual definition
-CFLAGS= -fno-pic -fno-pie -fno-exceptions  -ffreestanding -m32 -std=c17 -g 
+CFLAGS= -fno-pic -fno-pie -fno-exceptions  -ffreestanding -m32 -g  -I ./kernel/include
+#CFLAGS= -fno-pic -fno-pie -fno-exceptions  -ffreestanding -m32 -std=c17 -g  -I ./kernel/include
 
 # Convert the *.c filenames to *.o to give a list of object files to build
 OBJ = ${C_SOURCES:.c=.o }

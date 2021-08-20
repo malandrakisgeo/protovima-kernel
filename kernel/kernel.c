@@ -6,6 +6,7 @@
 } */
 
 #include "kernel.h"
+#include "cpu/idt.h"
 
 
 /* Written for the older version of PROTOVIMA. 
@@ -26,8 +27,9 @@ void main(){
     unsigned char myString[] = "Kernel running";
     printlnVGA(myString);
 
+    //TODO: interrupt handling
     boot_memory_init();
-    printlnVGA(myString);
-
+    //TODO: Initialize paging
+    initialize_idt();
     for(;;) {}  
 }
