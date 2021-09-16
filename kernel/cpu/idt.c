@@ -5,6 +5,7 @@
 void initialize_idt(){
     idtr.limit = 256*sizeof(idt_entry_t);
     idtr.base = (unsigned int)&idt;
+    __asm__ ("lidt %0" :: "m" (idtr)); //TODO: Kolla hur det här fungerar och varför 
 }
 
 void register_isr_handler(int n, int handler_address){

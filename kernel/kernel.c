@@ -6,7 +6,7 @@
 } */
 
 #include "kernel.h"
-#include "cpu/idt.h"
+#include "interrupt_service_routines.h"
 
 
 /* Written for the older version of PROTOVIMA. 
@@ -30,6 +30,6 @@ void main(){
     //TODO: interrupt handling
     boot_memory_init();
     //TODO: Initialize paging
-    initialize_idt();
+    isr_install();
     for(;;) {}  
 }

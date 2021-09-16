@@ -1,9 +1,9 @@
 #include "kernel.h"
+#include "vgaTextUtility.h" 
+
+unsigned int xPos=0;
+unsigned int yPos=0;
 uint16* vga_buffer;
-
-unsigned int xPos = 0;
-unsigned int yPos = 0;
-
 /*
 16 bit video buffer elements(register ax)
 8 bits(ah) higher : 

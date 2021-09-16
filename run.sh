@@ -22,9 +22,14 @@
 --------------------------
 
 #new way: 
-
-
 make clean
+cd ./utilities
+make all 
+cd ../kernel
+make all 
+cd cpu 
+make all
+cd ../..
 make all 
 qemu-system-i386 -m 3G -fda os.img
 
