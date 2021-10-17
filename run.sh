@@ -22,11 +22,16 @@
 --------------------------
 
 #new way: 
-
-
 make clean
+cd ./utilities
 make all 
-qemu-system-i386 -m 3G -fda os.img
+cd ../kernel
+make all 
+cd cpu 
+make all
+cd ../..
+make all 
+qemu-system-i386 -m 2G -fda os.img
 
 
 ## DEBUG METHOD 1: 

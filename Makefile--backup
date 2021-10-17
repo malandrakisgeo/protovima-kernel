@@ -1,7 +1,5 @@
 # Automatically generate lists of sources using wildcards
 C_SOURCES = $(wildcard kernel/*.c kernel/*/*.c)
-O_src = $(wildcard utilities/*.o kernel/*.o kernel/cpu/*.o)
-
 INC_DIR = .
 # The option -ffreestanding directs the compiler 
 # to not assume that standard functions 
@@ -70,13 +68,11 @@ kernel.buf: ${OBJ2}
 	ld -melf_i386 -T kernel/linker.ld -nostdlib --nmagic -o kernel.buf kernel.o
 	#objcopy -O binary kernel.elf kernel.buf
 
-
-#TODO: Something about the automatic compilation of all .asm files. Without explicitly calling them.
-kernel.bin: kernel/kernel_entry.o kernel/cpu/interrupt_routines.o ${OBJ} ${O_src}
+kernel.bin: kernel/kernel_entry.o ${OBJ}
 	ld -m elf_i386 -o $@ -Ttext 0x1000 $^ --oformat binary
 
 # Used for debugging purposes
-kernel.elf: kernel/kernel_entry.o ${OBJ} ${O_src}
+kernel.elf: kernel/kernel_entry.o ${OBJ}
 	ld -m elf_i386 -o $@ -Ttext 0x1000 $^
 
 # Assemble the boot sector to raw machine code
@@ -85,11 +81,9 @@ kernel.elf: kernel/kernel_entry.o ${OBJ} ${O_src}
 boot_sect.bin: ./boot/d.asm
 	nasm $< -f bin -i ./boot/ -o $@
 
-
-
 # This is the actual disk image that the computer loads ,
 # which is the combination of our compiled bootsector and kernel
-os.img: boot_sect.bin  kernel.bin
+os.img: boot_sect.bin kernel.bin
 	cat $^ > $@
 
 # Default build target .
@@ -109,7 +103,7 @@ clean:
 	find  . -name \*.bin -type f -delete
 	find  . -name \*.elf -type f -delete
 	find  . -name \*.buf -type f -delete
-	rm os.img
+	rm os-img
 
 # Run bochs to simulate booting of our code
 debug3: all kernel.elf

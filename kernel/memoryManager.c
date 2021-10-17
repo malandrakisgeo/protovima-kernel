@@ -44,13 +44,14 @@ void boot_memory_init()
 {
 
   struct boot_param *myboot_param = (struct boot_param *)(0x00000B00);
+  unsigned char *str; //for the itoa
 
 
 
 int address = 0x00000dfd0;
 int* pcontent = (int*)address;
 int content = *pcontent;
-  printlnVGA(itoa(content, ' d', 10));
+  //printlnVGA(itoa(content, ' d', 10));
 
 
 
@@ -61,13 +62,12 @@ int content = *pcontent;
 	 * We reserve memory below 1MB and use 820 map table
 	 * to find end of memory, ignoring real maps.
 	 */     
+  printlnVGA("Number of e820 entries: " + itoa(num, str, 10));
 
-  printlnVGA(itoa(num, ' d', 10));
-    unsigned char myString[] = "dd";
-	printlnVGA(myString);
+  ///printlnVGA(itoa(num, str, 10));
 
 	unsigned long memory_end = 0;
-	printlnVGA("Memory map: ");
+	printlnVGA("Total memory in MBs: ");
 	for (i = 0; i < num; i++) {
 		if (entry[i].type != E820_TYPE_FREE)
 			continue;
@@ -77,7 +77,6 @@ int content = *pcontent;
 	/* caculate the number of memory pages */
 	npage = memory_end / PGSIZE;
 
-  unsigned char *str; 
   str = itoa(npage * 4 / 1024, str, 10); //page in mbs
   printlnVGA(str);
 
