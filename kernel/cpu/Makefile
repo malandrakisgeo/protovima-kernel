@@ -38,10 +38,14 @@ H_OBJ = ${H_SOURCES:.h=.o }
 
 cpu.bin: ${CPU_OBJ} 
 	ld -m elf_i386 -o $@ -Ttext 0x1000 $^ --oformat binary
-	
 
 # Default build target .
+#TODO: Modify the disgrace below.
+
 all: ${CPU_OBJ} 
+	#rm interrupt_service_routines.o 
+	#gcc -c interrupt_service_routines.c interrupt_routines.o -o interrupt_service_routines.o
+
 
 debug: kernel.elf
 

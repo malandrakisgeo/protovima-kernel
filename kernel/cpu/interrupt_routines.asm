@@ -6,7 +6,13 @@
 
 isr_common:
     ; 1. Save CPU state
+	xor eax,eax
+	mov eax,0xfff
 	pushad ; Pushes 32bit registers as follows: eax, ecx, edx, ebx, esp, ebi, esi, edi
+	push ds
+	push es
+	push fs
+	push gs
 	mov ax, ds ; Lower 16-bits of eax = ds.
 	push eax ; save the data segment descriptor
 	mov ax, 0x10  ; kernel data segment descriptor
@@ -14,16 +20,17 @@ isr_common:
 	mov es, ax
 	mov fs, ax
 	mov gs, ax
+	mov eax, isr_pushed
 	
     ; 2. Call C handler
-	call isr_pushed
+	call eax
 	
     ; 3. Restore state
 	pop eax 
-	mov ds, ax
-	mov es, ax
-	mov fs, ax
-	mov gs, ax
+	pop gs 
+	pop fs 
+	pop es 
+	pop ds
 	popad
 	add esp, 8 ; TODO: Des an xreiazetai h an to kanei to iret outws h allws.
 	sti
@@ -32,28 +39,19 @@ isr_common:
     ;H diafora metaksu iret kai ret egkeitai sto oti to iret einai prosarmosmeno gia interrupts. isws auksanei ton esp kata 8
     ;https://pdos.csail.mit.edu/6.828/2008/readings/i386/s09_06.htm
 
-global irq0
-global irq1
+global isr0
+global isr1
 
-interrupt_handler:
+isr0:			;division by zero
 	cli
-    push dword %1                    ; push the interrupt number
-    jmp isr_common    ; jump to the common handler
-
-irq_handler:
-	cli
-    push byte 1                   ; push the interrupt number
-	push byte 2
-    jmp isr_common    ; jump to the common handler
-
-irq0:
-	cli
+	push byte 0 
 	push byte 0
-	push byte 32
 	jmp isr_common
+	ret;
 
-irq1:
+isr1:		;non maskable interrupt
 	cli
 	push byte 1
-	push byte 33
+	push byte 1
 	jmp isr_common
+	ret;

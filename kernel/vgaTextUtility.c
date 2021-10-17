@@ -126,6 +126,20 @@ void printlnVGA(unsigned char *msg){
   yPos++;
 }
 
+void println_serious_error(unsigned char *msg){
+
+  unsigned int i=0;
+  while(msg[i] != NULL  && msg[i] !='0x00'){
+    vga_buffer[xPos] = vga_entry(msg[i], BRIGHT_RED, BLACK);
+    i++;
+    xPos++;
+  }
+  xPos += ( MaxXInitial - i);
+  yPos++;
+  halt_cpu();
+}
+
+
 void printchVGA(unsigned char *msg){
 
   unsigned int i=0;

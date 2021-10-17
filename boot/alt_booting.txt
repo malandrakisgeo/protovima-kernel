@@ -1,0 +1,424 @@
+ 
+; A boot sector that boots from 16-bits mode into 32-bit protected mode and load a C kernel
+
+; When we reboot our computer, it doesn't have any notion of an operating system.
+; Luckily, we do have the Basic Input/Output Software (BIOS), 
+; a collection of software routines that are initially loaded from a chip into memory 
+; and initialised when the computer is switched on.
+
+; BIOS likes always to load 
+; the boot sector to the address 0x7c00
+; org directive tell the assembler 
+; where you expect the code will be loaded in memory
+; assembler will precalculate label address 
+; by offset + this value when it is compiled
+[org 0x7c00]
+
+; Typical lower memory layout afer boot
+; -----------------------------
+; Free Memory
+; ----------0x100000-----------
+; BIOS (256 KB)
+; ----------0xC0000------------
+; Video Memory (128 KB)
+; ----------0xA0000------------
+; Extended BIOS Data Area (639 KB)
+; ----------0x9fc00------------
+; Free (638 KB)
+; ----------0x7e00-------------
+; Loaded Boot Sector (512 Bytes)
+; ----------0x7c00-------------
+; Nothing
+; ----------0x500--------------
+; BIOS Data Area (256 Bytes)
+; ----------0x400--------------
+; Interrupt Vector Table (1 KB)
+; ----------0x0----------------
+
+; This is the memory offset to which we will load our kernel
+KERNEL_OFFSET equ 0x1000
+
+; When the CPU runs in its intial 16-bit real mode,
+; the maximum size of the registers is 16 bits,
+; which means that the highest address 
+; we can reference in an instruction is 0xffff (64 KB = 65536 bytes)
+; the CPU designers added a few more special registers,
+; cs, ds, ss, and es, called segment registers
+; We can imagine main memory as being divided into segments 
+; that are indexed by the segment registers
+; the CPU will offset our address from 
+; the segment register appropriate for the context of our instruction
+; To calculate the absolute address the CPU multiplies the value 
+; in the segment register by 16 and then adds your offset address
+[bits 16]
+global _start
+_start:
+    ; BIOS stores our boot drive in DL,
+    ; so it's best to remember this for later.
+    mov [BOOT_DRIVE], dl
+
+    ; Announce that we are starting
+    ; booting from 16-bit real mode
+    mov bx, MSG_REAL_MODE
+    
+    ; At the CPU level a function is nothing more than 
+    ; a jump to the address of a useful routine 
+    ; then a jump back again to the instruction 
+    ; immediately following the first jump
+    ; the caller and callee must have some agreement 
+    ; on where and how many parameters will be passed
+    ; the caller code could store the correct return address
+    ; in some well-known location,
+    ; then the called code could jump back to that stored address.
+    ; The CPU keeps track of the current instruction 
+    ; being executed in the special register ip
+    ;  the CPU provides a pair of instructions, call and ret, 
+    ; call behaves like jmp but additionally, 
+    ; before actually jumping, pushes the return address on to the stack; 
+    ; ret then pops the return address off the stack and jumps to it
+    call print_string
+
+; Load our kernel
+load_kernel:
+    ; Print a message to say we are loading the kernel
+    mov bx, MSG_LOAD_KERNEL
+    call print_string
+    ; we load the first 40 sectors that (excluding the boot sector)
+    ; we must increment this value when kernel size go over 20kb
+    mov dh, 12;
+    ; read from the boot disk
+    mov dl, [BOOT_DRIVE]
+    ; set the address that we'd like BIOS to read the sectors to
+    mov bx, KERNEL_OFFSET
+    ; load kernel code
+    call disk_load
+    call a20_gate_fast
+    pusha
+    call do_e820;
+    popa
+
+    ; switch to 32-bits protected mode
+    call switch_to_pm
+
+; Includes our useful routines
+%include "print_string.asm"
+%include "disk_load.asm"
+%include "switch_to_pm.asm"
+%include "a20.asm"
+%include "e8202.asm"
+
+; db = declare bytes of data which tells the assembler
+; to write the subsequent bytes directly to the binary output file
+; we often use a label to mark the start of our data
+; Global Variables
+BOOT_DRIVE: db 0 ; drive 0 (first floppy drive)
+; 10 is ascii code for line change and 0 is null character
+MSG_REAL_MODE: db "Booting from 16-bit Real Mode", 10, 0
+MSG_LOAD_KERNEL db "Loading kernel into memory", 10, 0
+MSG_PROT_MODE db "Protected mode", 10, 0
+ERROR_MSG db "ERR", 10, 0
+; >>>>>>>>>>> Bootsector padding and magic number <<<<<<<<<<
+; When compiled, our program must fit into 512 bytes,
+; with the last two bytes being the magic number,
+; so here, tell our assembly compiler to pad out our
+; program with enough zero bytes (db 0) to bring us to the
+; 510 th byte.
+; $ is the address of the current position before emitting the bytes
+; $$ evaluates to the beginning of the current section
+; so ($−$$) tell you how far into the section
+; db #value# just the byte #value# 
+times 510 - ($ - $$) db 0
+
+; Last two bytes ( one word ) make up the magic number,
+; so BIOS knows we are a boot sector.
+; dw #value# just the word #value# 
+dw 0xaa55
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+DISK_LOAD.ASM: 
+
+; Cylinder-Head-Sector (CHS)
+; Cylinder: the cylinder describes the head’s discrete distance from the outer edge
+; Head: the head describes which specific platter surface
+; Sector: the circular track is divided into sectors, usually of capacity 512 bytes
+; load DH sectors to ES:BX from drive DL
+disk_load:
+    ; the CPU has a limited number of registers 
+    ; for the temporary storage of our routine’s local variables
+    ; So, the CPU offers two instructions push and pop that allow us, 
+    ; respectively, to store a value and retrieve a value from the top of the stack, 
+    ; and so without worrying exactly where they are stored.
+    ; However, that we cannot push and pop single bytes 
+    ; onto and off the stack: in 16-bit mode, 
+    ; the stack works only on 16-bit boundaries.
+    ; The stack is implemented by two special CPU registers, bp and sp, 
+    ; which maintain the addresses of the stack base (i.e. the stack bottom) 
+    ; and the stack top respectively.
+    ; It grows downwards, when we issue a push 
+    ; the value gets stored below, 
+    ; the address of bp and sp is decremented by the value's size.
+
+    ; Store DX on stack so later we can recall
+    ; how many sectors were request to be read ,
+    ; even if it is altered in the meantime
+    push dx
+    
+    ; BIOS read sector function
+    mov ah, 0x02
+
+    ; Read DH sectors from the start point
+    mov al, dh
+
+    ; Select cylinder 0
+    mov ch, 0x00
+
+    ; Select head 0
+    ; Select the track this count has a base of 0
+    mov dh, 0x00
+
+    ; Start reading from second sector
+    ; (i.e. after the boot sector),
+    ; since this has a base of 1.
+    mov cl, 0x02
+
+    ; issue the BIOS interrupt to do the actual read.
+    int 0x13
+
+    ; jc is another jumping instruction, 
+    ; that jumps only if the carry flag was set.
+    jc disk_error ; Jump if error (i.e. carry flag set)
+
+    ; This jumps if what BIOS reported as the number of sectors
+    ; actually read in AL is not equal to the number we expected.
+    pop dx ; Restore DX from the stack
+    cmp dh, al ; if AL ( sectors read ) != DH ( sectors expected )
+    jne disk_error ; display error message
+    ret
+
+disk_error:
+    mov bx, DISK_ERROR_MSG
+    call print_string
+    ; Jumps to a new memory address to continue execution.
+    ; In our case, jump to the address of the current instruction.
+    jmp $
+
+; Disk Message
+DISK_ERROR_MSG db " Disk read error!", 10, 0
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+PRINT_STRING.ASM: 
+
+
+
+; Interrupts are a mechanism that 
+; allow the CPU temporarily to halt what it is doing and run some other, 
+; higher-priority instructions before returning to the original task.
+
+; An interrupt could be raised either by a software instruction (e.g. int 0x10) 
+; or by some hardware device that requires high-priority action
+
+; Each interrupt is represented by a unique number that 
+; is an index to the interrupt vector, 
+; a table initially set up by BIOS at the start of memory
+; at physical address0x0) that contains address pointers 
+; to interrupt service routines (ISRs)
+
+; An ISR is simply a sequence of machine instructions, 
+; much like our boot sector code, that deals
+; with a specific interrupt
+
+; BIOS adds some of its own ISRs to the interrupt vector 
+; that specialise in certain aspects of the computer
+
+; for example: interrupt 0x10 causes the screen-related ISR to be invoked
+; and interrupt 0x13, the disk-related I/O ISR
+
+; prints a message to the screen
+; int 10/ah=0eh -> scrolling teletype BIOS routine
+print_string:
+    mov ah, 0x0e
+; Define a label, that will allow
+; us to jump back to it
+print_string_while:
+    mov al, [bx]
+    or al, al
+    ; Conditional jumps are achieved in assembly language 
+    ; by first running a comparison instruction, 
+    ; then by issuing a specific conditional jump instruction.
+    ; the content of special flags register is used 
+    ; to capture the outcome of some instructions
+    ; je target ; jump if equal ( i.e. x == y)
+    ; jne target ; jump if not equal ( i.e. x != y)
+    ; jl target ; jump if less than ( i.e. x < y)
+    ; jle target ; jump if less than or equal ( i.e. x <= y)
+    ; jg target ; jump if greater than ( i.e. x > y)
+    ; jge target ; jump if greater than or equal ( i.e. x >= y)
+    jz print_string_done
+    int 0x10 ; print the character in al
+    add bx, 1
+    jmp print_string_while
+print_string_done:
+    ret
+
+
+
+
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+switch_to_pm.ASM:  
+
+
+
+; Switch to protected mode
+switch_to_pm:
+    ; We must switch of interrupts until we have
+    ; set -up the protected mode interrupt vector
+    ; otherwise interrupts will run riot.
+    cli
+
+    ; Load our global descriptor table,
+    ; which defines the protected mode segments
+    lgdt [gdt_descriptor]
+
+    ; To make the switch to protected mode,
+    ; we set the first bit of CR0, a control register
+        mov bx, MSG_PROT_MODE
+    call print_string
+    mov eax, cr0
+    or eax, 0x1
+    mov cr0 , eax ; Update the control register
+
+    ; the modern processors use a technique called pipelining, 
+    ; that allows them to process different stages 
+    ; of an instruction’s execution in parallel
+    ; each instruction might be fetched from memory,
+    ; decoded into microcode instructions, executed, 
+    ; then perhaps the result is stored back to memory; 
+    ; and since these stages are semi-independent, 
+    ; they could all be done within the same CPU cycle 
+    ; but within different circuitry
+    ; switching CPU modes is a risk that 
+    ; the CPU may process some stages of 
+    ; an instruction’s execution in the wrong mode
+    ; So after instructing the CPU to switch mode, 
+    ; is to force the CPU to finish any jobs in its pipeline,
+    ;  that we can be confident that 
+    ; all future instructions will be executed in the correct mode.
+    ; pipelining doesn't like instruction such as jmp or call,
+    ; because until those instructions have been executed fully 
+    ; the CPU can have no idea about the instructions 
+    ; that will follow them, especially if we use a far jump or call, 
+    ; which means that we jump to another segment.
+    ; So immediately after instructing the CPU to switch mode, 
+    ; we can issue a far jump, which will force the CPU to flush the pipeline
+    ; To issue a far jump, 
+    ; we additionally provide the target segment
+
+
+    ; Make a far jump ( i.e. to a new segment ) to our 32-bit code.
+    ; This also forces the CPU to flush
+    ; its cache of prefetched and real-mode decoded instructions,
+    ; which can cause problems.
+
+    jmp CODE_SEG:init_pm
+
+%include "gdt.asm"
+
+; Registers are extended to 32 bits
+; there are two additional general purpose segment registers, 
+; fs and gs.
+; 32-bit memory offsets are available, 
+; so an offset can reference a whopping 4 GB of memory
+; The CPU supports a more sophisticated and complex of memory segmentation
+; Code in one segment can be prohibited from executing code in a more privilidged segment
+; The CPU can implement virtual memory for user processes, 
+; such that pages (i.e. fixed-sized chunks) of a process’s memory 
+; can be swapped transparently between the disk and memory on an as-needed basis
+; Interrupt handling is also more sophisticated
+; we can no longer use BIOS once switched into 32-bit protected mode
+; we need to use the [bits 32] directive to tell our assembler that,
+; from that point onwards, it should encode in 32-bit mode instructions
+[bits 32]
+; Initialise registers and the stack once in PM.
+init_pm:
+    ; Now in PM , our old segments are meaningless,
+    ; so we point our segment registers to the
+    ; data selector we defined in our GDT
+
+    ; Stack Segment (SS). Pointer to the stack.
+    ; Code Segment (CS). Pointer to the code.
+    ; Data Segment (DS). Pointer to the data.
+    ; The address used in the instruction mov ax, [0x123f]
+    ; would by default offset from the data segment indexed by ds
+    ; Extra Segment (ES). Pointer to extra data ('E' stands for 'Extra').
+    ; F Segment (FS). Pointer to more extra data ('F' comes after 'E').
+    ; G Segment (GS). Pointer to still more extra data ('G' comes after 'F').
+    mov ax, DATA_SEG
+    mov ds, ax
+    mov ss, ax
+    mov es, ax
+    mov fs, ax
+    mov gs, ax
+
+    ; Set the stack
+    ; Update our stack position so it is right
+    ; at the top of the free space.
+    mov ebp, 0x9000
+    mov esp, ebp
+
+    ; Finally, jump to the address of our loaded kernel code
+    call KERNEL_OFFSET
+
+poweroff:
+    ; Try to turn off the computer when we return from the kernel
+    cli ; mask all maskable interrupts on CPU core
+suspend:
+    hlt ; turn CPU into HALT state (power saving mode C1)
+    jmp suspend ; try again if no maskable interrupt had happened

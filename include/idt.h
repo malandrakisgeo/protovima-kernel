@@ -2,7 +2,7 @@
 #include "kernel.h"
 
 /* 
-    Ena IDT entry antistoixizei kathe interrupt se enan Interrupt Service Routines (ISR). 
+    Ena IDT entry antistoixizei kathe interrupt se ena Interrupt Service Routine (ISR). 
     Perissotera: https://alex.dzyoba.com/blog/os-interrupts/
 */
 typedef struct {

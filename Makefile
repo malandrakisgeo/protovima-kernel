@@ -70,7 +70,9 @@ kernel.buf: ${OBJ2}
 	ld -melf_i386 -T kernel/linker.ld -nostdlib --nmagic -o kernel.buf kernel.o
 	#objcopy -O binary kernel.elf kernel.buf
 
-kernel.bin: kernel/kernel_entry.o ${OBJ} ${O_src}
+
+#TODO: Something about the automatic compilation of all .asm files. Without explicitly calling them.
+kernel.bin: kernel/kernel_entry.o kernel/cpu/interrupt_routines.o ${OBJ} ${O_src}
 	ld -m elf_i386 -o $@ -Ttext 0x1000 $^ --oformat binary
 
 # Used for debugging purposes
