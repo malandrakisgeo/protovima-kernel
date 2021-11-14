@@ -156,7 +156,7 @@ void writechar(unsigned char c, unsigned char forecolour, unsigned char backcolo
 {
      uint16 attrib = (backcolour << 4) | (forecolour & 0x0F);
      volatile uint16 * where;
-     where = (volatile uint16 *)0xB8000 + (y * 80 + x) ;
+     where = (volatile uint16 *)VGA_ADDRESS + (y * 80 + x) ;
      *where = c | (attrib << 8);
 }
 

@@ -31,7 +31,9 @@ cd cpu
 make all
 cd ../..
 make all 
-qemu-system-i386 -m 2G -fda os.img
+qemu-system-i386 -m 2G -fda os.img 
+#make kernel.elf
+#qemu-system-i386 -m 2G kernel.elf
 
 
 ## DEBUG METHOD 1: 

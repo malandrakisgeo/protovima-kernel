@@ -10,12 +10,8 @@ typedef unsigned long long ulong64;
 #define MaxYInitial 25
 #define MaxXInitial 80
 
-#define VGA_ADDRESS 0xB8000
-#define VGA_ORIGINAL 0xB8000
-#define E820_ADDRESS 0x0A000 //0x82500   0xE100     0xFC04    0x16104 0x8c00
-#define E820_ADDRESS2	((void *)VADDR(E820_ADDRESS))
-#define E820_ADDRESS5 0x00000dfd0 
-#define E820_ADDRESS4 0x1000
+#define VGA_ADDRESS 0xB8000 //Default for colour monitors. TODO: Check if it actually is just for the Real mode, and the protected has some more effective way than VGA access
+#define E820_ADDRESS 0x0B00 
 #define BUFSIZE 2200
 #define KERNEL_BASE	0x10000
 
@@ -74,8 +70,4 @@ typedef          short s16int;
 typedef unsigned char  u8int;
 typedef          char  s8int;
 
-/*void outb(u16int port, u8int value);
-u8int inb(u16int port);
-u16int inw(u16int port);
-*/
 #endif

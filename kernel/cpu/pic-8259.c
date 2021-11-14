@@ -43,6 +43,64 @@ void PIC_remap(int offset1, int offset2)
 	outb(SLAVE_PIC_DATA, ICW4_8086);
 	io_wait();
  
-	outb(MASTER_PIC_DATA, a1);   // restore saved masks.
-	outb(SLAVE_PIC_DATA, a2);
+	outb(MASTER_PIC_DATA, 0xff);   // restore saved masks.
+	outb(SLAVE_PIC_DATA, 0xff);
+}
+
+
+void initialize_pic()
+{
+    /* ICW1 - begin initialization */
+    outb(PIC_1_CTRL, 0x11);
+    outb(PIC_2_CTRL, 0x11);
+
+    /* ICW2 - remap offset address of idt_table */
+    /*
+    * In x86 protected mode, we have to remap the PICs beyond 0x20 because
+    * Intel have designated the first 32 interrupts as "reserved" for cpu exceptions
+    */
+    outb(PIC_1_DATA, 0x20);
+    outb(PIC_2_DATA, 0x28);
+
+    /* ICW3 - setup cascading */
+    outb(PIC_1_DATA, 0x00);
+    outb(PIC_2_DATA, 0x00);
+
+    /* ICW4 - environment info */
+    outb(PIC_1_DATA, 0x01);
+    outb(PIC_2_DATA, 0x01);
+    /* Initialization finished */
+
+    /* mask interrupts */
+    outb(0x21 , 0xff);
+    outb(0xA1 , 0xff);
+}
+
+
+ void initialize_picx()
+{
+    /* ICW1 - begin initialization */
+    write_port(PIC_1_CTRL, 0x11);
+    write_port(PIC_2_CTRL, 0x11);
+
+    /* ICW2 - remap offset address of idt_table */
+    /*
+    * In x86 protected mode, we have to remap the PICs beyond 0x20 because
+    * Intel have designated the first 32 interrupts as "reserved" for cpu exceptions
+    */
+    write_port(PIC_1_DATA, 0x20);
+    write_port(PIC_2_DATA, 0x28);
+
+    /* ICW3 - setup cascading */
+    write_port(PIC_1_DATA, 0x00);
+    write_port(PIC_2_DATA, 0x00);
+
+    /* ICW4 - environment info */
+    write_port(PIC_1_DATA, 0x01);
+    write_port(PIC_2_DATA, 0x01);
+    /* Initialization finished */
+
+    /* mask interrupts */
+    write_port(0x21 , 0xff);
+    write_port(0xA1 , 0xff);
 }

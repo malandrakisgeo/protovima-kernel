@@ -12,3 +12,12 @@ https://dev.to/frosnerd/writing-my-own-boot-loader-3mld
 and 
 
 https://github.com/vitaminac/minios
+
+==========================
+
+Sources used for the kernel: 
+
+osdev.org 
+lowlevel.eu 
+jamesmolloy.so.uk 
+reddit.com/r/osdev/

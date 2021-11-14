@@ -17,3 +17,9 @@
 #define ICW4_BUF_SLAVE	0x08		/* Buffered mode/slave */
 #define ICW4_BUF_MASTER	0x0C		/* Buffered mode/master */
 #define ICW4_SFNM	0x10		/* Special fully nested (not) */
+
+#define IDT_SIZE 256
+#define PIC_1_CTRL 0x20
+#define PIC_2_CTRL 0xA0
+#define PIC_1_DATA 0x21
+#define PIC_2_DATA 0xA1

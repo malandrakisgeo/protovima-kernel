@@ -25,7 +25,7 @@ _start:
     lgdt [gdt_descriptor]
     mov eax, cr0
     or eax, 1
-    mov cr0, eax    
+    mov cr0, eax  ;enables paging. To teleutaio bit tou CR0 einai to PE (paging enabled)
     jmp dword CODE_SEG:init_pm
 
 

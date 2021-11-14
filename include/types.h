@@ -10,6 +10,7 @@ struct SMAP_entry{
 	uint32 ACPI; // extended
 } ;
 
+};
 struct mem_entry{
     unsigned int base_address;
     unsigned int length;

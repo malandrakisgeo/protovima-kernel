@@ -33,7 +33,7 @@
  12F3:4B27 corresponds to the physical address 0x17A57
 */
 
-
+//TODO: Ftiakse kati antistoixo tou OOM killer gia th periptwsh pou h diathesimh mnhmh peftei se epipeda katw tou 5%
 
 
 //struct boot_param *myboot_param = (struct boot_param *)(E820_ADDRESS);
@@ -43,7 +43,7 @@
 void boot_memory_init()
 {
 
-  struct boot_param *myboot_param = (struct boot_param *)(0x00000B00);
+  struct boot_param *myboot_param = (struct boot_param *)(E820_ADDRESS);
   unsigned char *str; //for the itoa
 
 

@@ -19,7 +19,6 @@
 
 
 void main(){
-    //unsigned char * video_memory = (unsigned char *) VGA_ADDRESS;
     init_vga(WHITE, BLACK);
     
     //unsigned int * memaddress = (unsigned int *)0x7000; 
@@ -27,9 +26,16 @@ void main(){
     unsigned char myString[] = "Kernel running";
     printlnVGA(myString);
 
-    //TODO: interrupt handling
     boot_memory_init();
     //TODO: Initialize paging
+
+    //PIC_remap();
+    initialize_pic();
+    initialize_idt();
     isr_install();
-    for(;;) {}  
+    irq_install();
+       // int l = 1/0;
+
+    while(1) __asm__("hlt\n\t");
+
 }

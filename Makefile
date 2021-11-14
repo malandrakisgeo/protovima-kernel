@@ -73,10 +73,10 @@ kernel.buf: ${OBJ2}
 
 #TODO: Something about the automatic compilation of all .asm files. Without explicitly calling them.
 kernel.bin: kernel/kernel_entry.o kernel/cpu/interrupt_routines.o ${OBJ} ${O_src}
-	ld -m elf_i386 -o $@ -Ttext 0x1000 $^ --oformat binary
+	ld -m elf_i386 -o $@ -T linker.ld  $^ --oformat binary
 
 # Used for debugging purposes
-kernel.elf: kernel/kernel_entry.o ${OBJ} ${O_src}
+kernel.elf: kernel/kernel_entry.o kernel/cpu/interrupt_routines.o ${OBJ} ${O_src}
 	ld -m elf_i386 -o $@ -Ttext 0x1000 $^
 
 # Assemble the boot sector to raw machine code
