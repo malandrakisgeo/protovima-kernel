@@ -2,7 +2,7 @@ My first step in kernel programming. More of a playground than an actual project
 
 Goal: an OS providing a simple shell with some basic commands. 
 
-Supposed to run on any i386 architecture. 
+Supposed to run on any single-core CPU with an i386 architecture. 
 
 ==========================
 Bootloader&Makefile largely based on::
