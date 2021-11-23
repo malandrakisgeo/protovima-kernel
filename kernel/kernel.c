@@ -34,7 +34,7 @@ void main(){
     initialize_idt();
     isr_install();
     irq_install();
-       // int l = 1/0;
+       // int l = 1/0; //test for division-by-zero exception
 
     while(1) __asm__("hlt\n\t");
 

@@ -36,6 +36,7 @@ extern void keyboard_handler_int();
 
 void *irq_routines[16] = {0};
 
+int capsLock = 0; //boolean
 
 const char* exception_messages[] = 
 {
@@ -71,22 +72,24 @@ const char* exception_messages[] =
 	"Reserved",
 	"Reserved",
 	"Reserved",
-		"Reserved",
-	"Reserved",
-	"Reserved",
-		"Reserved"
-
 };
 
 
 // This gets called from our ASM interrupt handler stub. Jamesmolloy.co.uk.
 void irq_handler(struct pushed_values* regs){
-    printlnVGA("IRQ handled");
-         char *str = exception_messages[regs->int_no];
-    printlnVGA(str);
+	if(regs->int_no <32 ){
+		printlnVGA("IRQ handled");
+		char *str = exception_messages[regs->int_no];
+		printlnVGA(str);
+		inb(0x60); //xwris to inb skalwnei xwris na dexetai deutero interrupt.
+	}
 
+	if(regs->int_no == 33){
+		unsigned int scancode = inb(0x60); //xwris to inb skalwnei xwris na dexetai deutero interrupt.
+		general_keyboard_handler(scancode);
 
-    inb(0x60); //xwris to inb skalwnei xwris na dexetai deutero interrupt.
+	}
+
     outb(0x20, 0x20);
 }
 
@@ -126,7 +129,7 @@ void isr_pushed(struct pushed_values* val){
 
 void isr_install(){
 
-        //register_isr_handler(0, (unsigned int)isr0);
+        register_isr_handler(0, (unsigned int)isr0);
         register_isr_handler(1, (unsigned int)isr1);
 	    register_isr_handler(2, (unsigned int)isr2);
 	    register_isr_handler(3, (unsigned int)isr3);
