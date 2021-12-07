@@ -1,24 +1,15 @@
 C_SOURCES = $(wildcard kernel/*.c kernel/*/*.c)
-CPU_SOURCES = $(wildcard *.c)
+PROCESS_SOURCES = $(wildcard *.c)
+
 CFLAGS= -fno-pic -fno-pie -fno-exceptions -Wno-implicit-function-declaration  -ffreestanding -m32 -g   -I../../include
-CPU_OBJ = ${CPU_SOURCES:.c=.o }
+
+PROC_OBJ = ${PROCESS_SOURCES:.c=.o }
 
 %.o: %.c
 	gcc ${CFLAGS} -c $< -o $@
-
-%.o: %.asm
-	nasm $< -f elf -o $@
-
-all: ${CPU_OBJ} 
-
-debug: kernel.elf
-
-kernel.dis: kernel.bin
-	ndisasm -b 32 $< > $@
+	
+all: ${PROC_OBJ} 
 
 clean:
 	find  . -name \*.o -type f -delete
 	find  . -name \*.bin -type f -delete
-	find  . -name \*.elf -type f -delete
-	find  . -name \*.buf -type f -delete
-

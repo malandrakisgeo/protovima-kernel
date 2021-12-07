@@ -29,6 +29,8 @@ cd ../kernel
 make all 
 cd cpu 
 make all
+cd ../process
+make all
 cd ../..
 make all 
 qemu-system-i386 -m 2G -fda os.img 

@@ -1,6 +1,6 @@
 # Automatically generate lists of sources using wildcards
 C_SOURCES = $(wildcard kernel/*.c kernel/*/*.c)
-O_src = $(wildcard utilities/*.o kernel/*.o kernel/cpu/*.o)
+O_src = $(wildcard utilities/*.o kernel/*.o kernel/cpu/*.o kernel/process/*.o)
 
 INC_DIR = .
 # The option -ffreestanding directs the compiler 
