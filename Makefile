@@ -7,7 +7,6 @@ INC_DIR = .
 # to not assume that standard functions 
 # have their usual definition
 CFLAGS= -fno-pic -fno-pie -fno-exceptions -Wno-implicit-function-declaration  -ffreestanding -m32 -g  -Ihome/georgem/Developer/OS-projects/PROTOVIMA-kernel/include/
-#CFLAGS= -fno-pic -fno-pie -fno-exceptions  -ffreestanding -m32 -std=c17 -g  -I ./kernel/include
 
 # Convert the *.c filenames to *.o to give a list of object files to build
 OBJ = ${C_SOURCES:.c=.o }
