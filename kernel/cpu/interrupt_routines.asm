@@ -5,7 +5,6 @@
 [extern isr_pushed]
 [extern irq_handler]
 
-
 global isr0
 global isr1
 global isr2
@@ -103,7 +102,6 @@ isr8:
                    ; It pushes one already! Use this type of stub for exceptions that pop error codes!
     jmp isr_common
     
-    
 ;9: Coprocessor Segment Overrun Exception
 isr9:
     cli
@@ -111,13 +109,11 @@ isr9:
     push byte 9
     jmp isr_common
     
-    
 ;10: Bad TSS Exception
 isr10:
     cli
     push byte 10
     jmp isr_common
-    
     
 ;11: Segment Not Present Exception
 isr11:
@@ -125,13 +121,11 @@ isr11:
     push byte 11
     jmp isr_common
     
-    
 ;12: Stack Fault Exception
 isr12:
     cli
     push byte 12
     jmp isr_common
-    
     
 ;13: General Protection Fault Exception
 isr13:
@@ -139,13 +133,11 @@ isr13:
     push byte 13
     jmp isr_common
     
-    
 ;14: Page Fault Exception
 isr14:
     cli
     push byte 14
     jmp isr_common
-    
     
 ;15: Unknown Interrupt Exception
 isr15:
@@ -154,14 +146,12 @@ isr15:
     push byte 15
     jmp isr_common
     
-    
 ;16: Coprocessor Fault Exception
 isr16:
     cli
     push byte 0
     push byte 16
     jmp isr_common
-    
     
 ;17: Alignment Check Exception (486+)
 isr17:
@@ -170,14 +160,12 @@ isr17:
     push byte 17
     jmp isr_common
     
-    
 ;18: Machine Check Exception (Pentium/586+)
 isr18:
     cli
     push byte 0
     push byte 18
     jmp isr_common
-    
     
 ;19: Reserved Exception
 isr19:
@@ -186,14 +174,12 @@ isr19:
     push byte 19
     jmp isr_common
     
-    
 ;20: Reserved Exception
 isr20:
     cli
     push byte 0
     push byte 20
     jmp isr_common
-    
     
 ;21: Reserved Exception
 isr21:
@@ -208,8 +194,6 @@ isr22:
     push byte 0
     push byte 22
     jmp isr_common
-    
-
 
 isr_common:
     ; 1. Save CPU state
@@ -243,7 +227,6 @@ isr_common:
 	add esp, 8 ; TODO: Des an xreiazetai h an to kanei to iret outws h allws.
 	sti
 	iret ; pops 5 things at once: CS, EIP, EFLAGS, SS, and ESP, kai epistrefei ston diakekommeno kwdika
-    
     ;H diafora metaksu iret kai ret egkeitai sto oti to iret einai prosarmosmeno gia interrupts. isws auksanei ton esp kata 8
     ;https://pdos.csail.mit.edu/6.828/2008/readings/i386/s09_06.htm
 
@@ -272,8 +255,6 @@ irq_common_stub:
 	add esp, 8
 	sti
 	iretd
-
-
 
 ; 32: IRQ0
 irq0:
@@ -392,10 +373,7 @@ _irq15:
 	jmp irq_common_stub
 		
 
-
-
-
-; arg: int, port number.
+;arg: int, port number.
 read_port:
     mov edx, [esp + 4]
     in al, dx
@@ -409,10 +387,6 @@ write_port:
     out   dx, al
     ret
  
-
-
-
-
 
 global load_idt
 

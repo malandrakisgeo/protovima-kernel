@@ -5,7 +5,6 @@ global do_e820
  do_e820:
     pushad
 	xor ax,ax
-	;mov ax, 0x0000
 	mov es,ax
     xor ebp, ebp			;/* entry number */
     xor ebx, ebx		;	/* ebx must be 0 to start */
@@ -37,13 +36,8 @@ global do_e820
 	xor eax, eax
 	mov  [ 0x00000dfd0], ebp ;how many entries
 	mov eax, es:edi
-	;mov  [0x000002fd0],eax
     popad
     ret
 .fail_e820:
     stc
 	jmp .fail_e820			;/* end of boot trap */
-
-
-    ;  0x07c0*16 + 0x1000    0x8C00
-;  0x07c0*16 and 0x1c00 = 0x9800
