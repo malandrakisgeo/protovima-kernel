@@ -1,4 +1,3 @@
-C_SOURCES = $(wildcard kernel/*.c kernel/*/*.c)
 PROCESS_SOURCES = $(wildcard *.c)
 
 CFLAGS= -fno-pic -fno-pie -fno-exceptions -Wno-implicit-function-declaration  -ffreestanding -m32 -g   -I../../include

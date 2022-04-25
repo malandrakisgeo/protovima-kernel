@@ -1,6 +1,6 @@
 My first step in kernel programming. More of a playground than an actual project.
 
-Goal: an OS providing a simple shell with some basic commands. 
+Goal: a kernel providing a shell with some basic commands. 
 
 Supposed to run on any single-core CPU with an i386 architecture. 
 
@@ -21,3 +21,11 @@ osdev.org
 lowlevel.eu 
 jamesmolloy.so.uk 
 reddit.com/r/osdev/
+
+==========================
+OS Theory sources: 
+
+Operating System Concepts - Silberschatz-Gagne- Galvin
+Modern Operating Systems - Tanenbaum-Bos
+osdev.org
+https://os.phil-opp.com

@@ -94,7 +94,7 @@ unsigned char *itoa( unsigned long value, unsigned char * str, unsigned int base
     return rc;
 }
 
-strlen(const char *str) //BSD implementation
+int strlen(const char *str) //BSD implementation
 {
         const char *s;
 
@@ -103,7 +103,8 @@ strlen(const char *str) //BSD implementation
         return (s - str);
 }
 
-println(unsigned char *text){
+/* TODO: Check it
+int println(unsigned char *text){
   int i, l;
   for (i = 0; i < strlen(text); i++)
     {
@@ -113,7 +114,7 @@ println(unsigned char *text){
   xPos += ( MaxXInitial - strlen(text));
   yPos++;
 }
-
+*/
 void printlnVGA(unsigned char *msg){
 
   unsigned int i=0;

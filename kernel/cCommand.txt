@@ -1,2 +1,0 @@
- 
-gcc -fno-pic -fno-pie -fno-exceptions -Wno-implicit-function-declaration  -ffreestanding -m32 -g  -I../include -I./   kernel.c memoryManager.c vgaTextUtility.c cpu/interrupt_service_routines.c cpu/idt.c cpu/pic-8259.c cpu/cpu.c cpu/inline-assembly.c -o stat

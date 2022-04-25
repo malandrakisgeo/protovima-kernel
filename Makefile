@@ -1,12 +1,13 @@
 # Automatically generate lists of sources using wildcards
-C_SOURCES = $(wildcard kernel/*.c kernel/*/*.c)
-O_src = $(wildcard utilities/*.o kernel/*.o kernel/cpu/*.o kernel/process/*.o)
+C_SOURCES = $(wildcard kernel/*.c kernel/process/*.c kernel/memory/*.c  kernel/cpu/*.c utilities/*.c)
+O_src = $(wildcard utilities/*.o kernel/*.o kernel/cpu/*.o kernel/process/*.o  kernel/memory/*.o)
+
 
 INC_DIR = .
 # The option -ffreestanding directs the compiler 
 # to not assume that standard functions 
 # have their usual definition
-CFLAGS= -fno-pic -fno-pie -fno-exceptions -Wno-implicit-function-declaration  -ffreestanding -m32 -g  -Ihome/georgem/Developer/OS-projects/PROTOVIMA-kernel/include/
+CFLAGS= -fno-pic -fno-pie -fno-exceptions -Wno-multichar -Wno-int-conversion -Wno-implicit-function-declaration -nostdlib -nostdinc -fno-builtin -fno-stack-protector -nostartfiles -nodefaultlibs -ffreestanding -m32 -g  -I include/
 
 # Convert the *.c filenames to *.o to give a list of object files to build
 OBJ = ${C_SOURCES:.c=.o }
@@ -70,9 +71,10 @@ kernel.buf: ${OBJ2}
 	#objcopy -O binary kernel.elf kernel.buf
 
 
-#TODO: Something about the automatic compilation of all .asm files. Without explicitly calling them.
-kernel.bin: kernel/kernel_entry.o kernel/cpu/interrupt_routines.o  ${OBJ} ${O_src}
+kernel.bin: kernel/kernel_entry.o kernel/cpu/interrupt_routines.o  ${OBJ} 
 	ld -m elf_i386 -o $@ -T linker.ld  $^ --oformat binary
+	
+	#ld -m elf_i386 -o $@ -Ttext 0x1000  $^ --oformat binary
 
 # Used for debugging purposes
 kernel.elf: kernel/kernel_entry.o kernel/cpu/interrupt_routines.o ${OBJ} ${O_src}
@@ -82,13 +84,14 @@ kernel.elf: kernel/kernel_entry.o kernel/cpu/interrupt_routines.o ${OBJ} ${O_src
 # The -I options tells nasm where to find our useful assembly
 # routines that we include in boot_sect . asm
 boot_sect.bin: ./boot/d.asm
+#boot_sect.bin: ./boot/bootsect.asm
 	nasm $< -f bin -i ./boot/ -o $@
 
 
 
 # This is the actual disk image that the computer loads ,
 # which is the combination of our compiled bootsector and kernel
-os.img: boot_sect.bin  kernel.bin
+os.img: boot_sect.bin  kernel.bin 
 	cat $^ > $@
 
 # Default build target .

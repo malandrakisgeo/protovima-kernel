@@ -1,6 +1,6 @@
 //https://stackoverflow.com/questions/37618111/keyboard-irq-within-an-x86-kernel
 
-unsigned char keyboard_map[128] =
+unsigned char keyboard_map[256] =
 {
     0,  27, '1', '2', '3', '4', '5', '6', '7', '8',     /* 9 */
   '9', '0', '-', '=', '\b',     /* Backspace */
@@ -43,7 +43,7 @@ unsigned char keyboard_map[128] =
     'Q', 'W', 'E', 'R',   
   'T', 'Y', 'U', 'I', 'O', 'P', 0, 0, 0,0,
   'A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L', 0,    
- 0, 0,   0,  0, 'z', 'x', 'c', 'v', 'b', 'n',                    /* 49 */
+ 0, 0,   0,  0, 'Z', 'X', 'C', 'V', 'B', 'N',                    /* 49 */
   'M',
 };
 

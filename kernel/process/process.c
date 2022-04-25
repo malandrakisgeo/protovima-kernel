@@ -20,7 +20,24 @@ wste apla na doulevei.
 
 */
 
-
 void remove_thread(struct pv_thread *pv_thread){
+    pv_thread->status = THREAD_EXITING;
+
+    if(pv_thread->parent_process->total_threads > 1){
+        if(pv_thread->next_thread && pv_thread->previous_thread){
+            pv_thread->next_thread->previous_thread = pv_thread->previous_thread;
+            pv_thread->previous_thread->next_thread = pv_thread->next_thread;
+        }else if(pv_thread->next_thread){
+            pv_thread->next_thread->previous_thread = NULL;
+            pv_thread->parent_process->threads = pv_thread->next_thread;
+        }else{
+            pv_thread->previous_thread->next_thread = NULL;
+        }
+        //TODO: Free memory
+
+    }else{
+        //Free memory and... perhaps terminate the process too?
+    }
+
 
 }

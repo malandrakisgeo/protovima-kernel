@@ -1,10 +1,4 @@
 
-
-/*void main () {
-    char* video_memory = ( char*) 0xb8000 ;
-    *video_memory = 'A';
-} */
-
 #include "kernel.h"
 #include "interrupt_service_routines.h"
 
@@ -29,7 +23,7 @@ void main(){
     boot_memory_init();
     //TODO: Initialize paging
 
-    //PIC_remap();
+    PIC_remap();
     initialize_pic();
     initialize_idt();
     isr_install();

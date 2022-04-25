@@ -94,7 +94,7 @@ void irq_handler(struct pushed_values* regs){
 }
 
 void isr_pushed(struct pushed_values* val){
-        println("Interrupt received");
+        printlnVGA("Interrupt received");
     
     char *str = exception_messages[val->int_no];
     printlnVGA(str);

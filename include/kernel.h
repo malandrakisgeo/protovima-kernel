@@ -29,11 +29,20 @@ typedef struct e820_entry {
 	unsigned int length_high;
 	unsigned int type;
 	unsigned int pad;
-};
+}e820_entry;
+
+typedef struct memory_entry {
+	unsigned int start_addr;
+	unsigned long length;
+}memory_entry;
+
+
+
+
 
 struct boot_param {
-	struct e820_entry memMapp[128];
-	unsigned long e820_num;
+	struct e820_entry memMapp[256];
+	unsigned int e820_num;
 };
 
 

@@ -16,7 +16,7 @@ extern void init_vga(uint8 fore_color, uint8 back_color);
 extern unsigned char *itoa( unsigned long value, unsigned char * str, unsigned int base );
 
 
-extern println(unsigned char *text);
+extern int println(unsigned char *text);
 
 extern void printlnVGA(unsigned char *msg);
 
