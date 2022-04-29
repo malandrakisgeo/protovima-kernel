@@ -1,5 +1,6 @@
 #include "interrupt_service_routines.h"
 #include "inline-assembly.h"
+#include "kernel.h"
 
 extern void isr0();
 extern void isr1();
@@ -32,7 +33,10 @@ extern void _irq12();
 extern void _irq13();
 extern void _irq14();
 extern void _irq15();
+
 extern void keyboard_handler_int();
+
+extern int keyboard_in_use;
 
 void *irq_routines[16] = {0};
 

@@ -3,6 +3,8 @@
 
 unsigned int xPos=0;
 unsigned int yPos=0;
+unsigned int single_chars=0;
+
 uint16* vga_buffer;
 /*
 16 bit video buffer elements(register ax)
@@ -118,6 +120,12 @@ int println(unsigned char *text){
 void printlnVGA(unsigned char *msg){
 
   unsigned int i=0;
+  if(single_chars!=0){
+    xPos += ( MaxXInitial - single_chars);
+    single_chars=0;
+  }
+
+  
   while(msg[i] != NULL  && msg[i] !='0x00'){
     vga_buffer[xPos] = vga_entry(msg[i], BRIGHT_GREEN, BLACK);
     i++;
@@ -128,13 +136,15 @@ void printlnVGA(unsigned char *msg){
 }
 
 
-void printchar(unsigned char msg){
-
-  unsigned int i=0;
-    vga_buffer[xPos] = vga_entry(msg, BRIGHT_GREEN, BLACK);
-    i++;
+void printchar(unsigned char *msg){
+  if(msg != NULL  && msg !='0x00'){
+      vga_buffer[xPos] = vga_entry(msg, BRIGHT_GREEN, BLACK);
     xPos++;
-    
+  }
+  if(msg=='\n'){
+      xPos +=  (MaxXInitial -1);
+  }
+    single_chars++;
 }
 void println_serious_error(unsigned char *msg){
 
@@ -162,7 +172,7 @@ void printchVGA(unsigned char *msg){
   yPos++;
 }
 
-void writechar(unsigned char c, unsigned char forecolour, unsigned char backcolour, int x, int y)
+/*void writechar(unsigned char c, unsigned char forecolour, unsigned char backcolour, int x, int y)
 {
      uint16 attrib = (backcolour << 4) | (forecolour & 0x0F);
      volatile uint16 * where;
@@ -179,3 +189,4 @@ void writeline(unsigned char *msg)
        ++x;
      }
 }
+*/

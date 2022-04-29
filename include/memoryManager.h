@@ -1,5 +1,4 @@
 
-#include "kernel.h"
 
 #define FRAME_SIZE 4096 //physical memory
 #define PAGE_SIZE 4096 //virtual memory
@@ -23,11 +22,6 @@ typedef struct free_pages {
 }free_pages;
 
 
-/*typedef struct page_frame_link{
-    struct page *page;
-    struct phys_mem_frame *frame;
-};*/
-
 
 
 typedef struct page_table{
@@ -36,8 +30,24 @@ typedef struct page_table{
     int flags;
 }page_table;
 
+typedef struct e820_entry {
+	unsigned int addr;
+	unsigned int addr_high;
+	unsigned int length;
+	unsigned int length_high;
+	unsigned int type;
+	unsigned int pad;
+}e820_entry;
 
+typedef struct memory_entry {
+	unsigned int start_addr;
+	unsigned long length;
+}memory_entry;
 
+struct boot_param {
+	struct e820_entry memMapp[256];
+	unsigned int e820_num;
+};
 
 extern void boot_memory_init();
 

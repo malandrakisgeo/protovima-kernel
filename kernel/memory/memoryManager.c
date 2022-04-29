@@ -75,10 +75,10 @@ void boot_memory_init()
   str = itoa(available_memory / (1024*1024), str, 10); 
   printlnVGA(str);
 
-  printlnVGA("Unavailable memory: ");
+  /*printlnVGA("Unavailable memory: ");
   str = itoa(unavailable_memory / (1024*1024), str, 10); 
   printlnVGA(str);
-
+*/
 
   str = itoa(memory_end / (1024*1024), str, 10); //page in mbs
   printlnVGA(str);

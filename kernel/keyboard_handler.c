@@ -2,13 +2,33 @@
 
 int tableOffset = 0; //if caps lock or right shift, there will be an offset of 90
 
-void show_received_char(int char_pos){
-    char str = keyboard_map[char_pos];
-    printchar(str);
-        //printlnVGA(itoa(char_pos,"",10));
+extern int foreground_process; //Zero if no foreground_process, equal to the address pointer of its' main function otherwise
 
+void send_to_foreground_process(char ch){
+    if(foreground_process!=0){
+        typedef void func(char);
+        func* f = (func*)foreground_process;
+        f(ch);
+    }
 }
 
+
+
+void show_received_char(int char_pos){
+    unsigned char *a; 
+    a = itoa(char_pos, a, 10); 
+    
+
+    char str = keyboard_map[char_pos];
+    if(foreground_process==0){ //If there is no foreground process running such as e.g. terminal
+        printchar(str); 
+    }else{
+        //printlnVGA(a);
+        send_to_foreground_process(str);
+    }
+    
+
+}
 
 //TODO: Make it less buggy
 void general_keyboard_handler(unsigned int scancode){
@@ -31,13 +51,6 @@ void general_keyboard_handler(unsigned int scancode){
         }
                
 	}
-
-
-
-
-
-
-
     //if(!scancode & 0x80){
     //}
 

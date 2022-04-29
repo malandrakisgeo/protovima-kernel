@@ -41,10 +41,11 @@ unsigned char keyboard_map[256] =
         0,  0, 0,0,0,0,0,0,0,0,     /* If there is a shift or a caps lock, these will be used: */
   0,0,0,0,0,0,
     'Q', 'W', 'E', 'R',   
-  'T', 'Y', 'U', 'I', 'O', 'P', 0, 0, 0,0,
+  'T', 'Y', 'U', 'I', 'O', 'P', 0, 0, '\n',0,
   'A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L', 0,    
  0, 0,   0,  0, 'Z', 'X', 'C', 'V', 'B', 'N',                    /* 49 */
-  'M',
+  'M', ',', '.', '/',   0,                              
+  '*', 0,  ' ',  
 };
 
 void show_received_char(int char_pos);

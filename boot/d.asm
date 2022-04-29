@@ -11,7 +11,7 @@ _start:
     mov sp, MEM_POS 
     mov ax, ERROR_MSG2
     mov [BOOT_DRIVE], dl; Boot drive passed to us by the BIOS
-    mov dh, 20        ; Number of sectors (kernel.bin) to read from disk
+    mov dh, 22        ; Number of sectors (kernel.bin) to read from disk
                         ; 17*512 allows for a kernel.bin up to 8704 bytes
     mov bx, MEM_POS      ; Load Kernel to ES:BX = 0x0000:0x9000  or 0x0000:0xA000 or.... 
     call load_kernel

@@ -10,7 +10,10 @@
          ".popsection\r\n"
          );  */
 
+extern start_terminal();
 
+int foreground_process = 0;
+int calling_foreground_process = 0;
 
 void main(){
     init_vga(WHITE, BLACK);
@@ -29,6 +32,8 @@ void main(){
     isr_install();
     irq_install();
        // int l = 1/0; //test for division-by-zero exception
+       //keyboard_in_use = 1;
+       start_terminal();
 
     while(1) __asm__("hlt\n\t");
 

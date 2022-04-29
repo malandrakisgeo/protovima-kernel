@@ -22,28 +22,15 @@ typedef unsigned long long ulong64;
 #define PGSIZE	0x1000
 #define VGA_ADDRESS2	((void *)VADDR(VGA_ORIGINAL))
 
-typedef struct e820_entry {
-	unsigned int addr;
-	unsigned int addr_high;
-	unsigned int length;
-	unsigned int length_high;
-	unsigned int type;
-	unsigned int pad;
-}e820_entry;
-
-typedef struct memory_entry {
-	unsigned int start_addr;
-	unsigned long length;
-}memory_entry;
 
 
 
 
 
-struct boot_param {
-	struct e820_entry memMapp[256];
-	unsigned int e820_num;
-};
+
+
+
+
 
 
 enum vga_color {
