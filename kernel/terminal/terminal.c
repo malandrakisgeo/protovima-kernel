@@ -32,7 +32,7 @@ void run_command(char *ch){
 
     int cmd_not_found = 0;
 
-    for(int i =0; i<2; i++){
+    for(int i =0; i<3; i++){
         int j=0;
         cmd_not_found = 0;
 
@@ -48,14 +48,15 @@ void run_command(char *ch){
             calling_foreground_process = foreground_process;
             foreground_process = cmd;
             run_foreground_process();
-            foreground_process = calling_foreground_process;
+            foreground_process = calling_foreground_process; //return to terminal
 
-            return;
-        }else{
-             printlnVGA("Command not found.");
             return;
         }
+    }
 
+    if(cmd_not_found==1){
+            printlnVGA("Command not found."); 
+            return;
     }
 
 }
@@ -79,6 +80,11 @@ void sample_command(){
     return;
 }
 
+void dample_command(){
+    printlnVGA("Another command ran");
+    return;
+}
+
 /*
     It creates a struct that links command names to memory addresses.
 */
@@ -95,7 +101,7 @@ void start_terminal(){
     cmds[0].name = "sample";
     cmds[0].command_pointer = sample_command;
     cmds[1].name = "dample";
-    cmds[1].command_pointer = sample_command;
+    cmds[1].command_pointer = dample_command;
 
 
 }
