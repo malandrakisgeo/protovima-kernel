@@ -41,3 +41,10 @@ char* clear_command(char dest[])
    //dest[++i] = '\0';
    return dest;
 }
+
+//The cursor is already disabled via a BIOS function, but perhaps I'll switch to this method someday
+void disable_cursor()
+{
+	outb(0x3D4, 0x0A);
+	outb(0x3D5, 0x20);
+}

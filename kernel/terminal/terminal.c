@@ -10,47 +10,60 @@ char command[32];
 struct command_pointer cmds[32] ;
 
 
-void run_foreground_process(){
+char fetch_args(char inserted_chars[], char args[], int cmd_name_ending_position){
+    int i = cmd_name_ending_position, j=0;
+    while(inserted_chars[i]!=0){
+        args[j++] = inserted_chars[i++];
+    }
+}
+
+
+void run_foreground_process(char args[]){
     if(foreground_process!=0){
         typedef void func();
         func* f = (func*)foreground_process;
-        f();
+        f(args);
     }
 }
 
 /*
-    Ok, this isn't an efficient way to do it, but it works. 
+    Ok, this isn't the best way to do it, but it works. 
 
-    As a C-n00b with a Java background, I am unable to find an equivalent of a HashMap
+    As a C-n00b with a Java background, I was unable to find an equivalent of a HashMap
     that would map the name of a command to a function pointer. 
     So I am doing a char-by-char comparison of the command entered and if some equivalent is found in the
     command_pointer struct, the corresponding function pointer is called.
 
     TODO: Learn better C and find a less retarded way to achieve this
 */
-void run_command(char *ch){
+void run_command(char *inserted_chars){
 
     int cmd_not_found = 0;
-
-    for(int i =0; i<3; i++){
-        int j=0;
+    int j;
+    for(int i =0; i<32; i++){
+        j=0;
         cmd_not_found = 0;
 
         while(cmds[i].name[j] != 0 && cmd_not_found==0){
-            if( (int)(cmds[i].name[j] ^ ch[j]) != 0){
+            if( (int)(cmds[i].name[j] ^ inserted_chars[j]) != 0){
                 cmd_not_found=1;
             }
             j++;
         }
 
         if(!cmd_not_found){
+            char args[32];
+
+
             void (*cmd)() = cmds[i].command_pointer; //function pointer
             calling_foreground_process = foreground_process;
             foreground_process = cmd;
-            run_foreground_process();
+
+            fetch_args(inserted_chars, args, j);
+            run_foreground_process(args);
             foreground_process = calling_foreground_process; //return to terminal
 
-            return;
+            break;
         }
     }
 
@@ -58,6 +71,9 @@ void run_command(char *ch){
             printlnVGA("Command not found."); 
             return;
     }
+
+
+    return;
 
 }
 
@@ -80,9 +96,30 @@ void sample_command(){
     return;
 }
 
-void dample_command(){
-    printlnVGA("Another command ran");
+void dample_command(char ch[]){
+    if(ch[0]!=0){
+        printlnVGA("You inserted the arguments: ");
+        printlnVGA(ch);
+    }else{
+        printlnVGA("No arguments inserted.");
+    }
+
     return;
+}
+
+
+
+
+void register_commands(){
+             typedef void func(char);
+        func* dmp = (func*)dample_command;
+
+
+    cmds[0].name = "sample";
+    cmds[0].command_pointer = sample_command;
+    cmds[1].name = "dample";
+    cmds[1].command_pointer = dample_command;
+
 }
 
 /*
@@ -90,21 +127,19 @@ void dample_command(){
 */
 
 void start_terminal(){
+    register_commands();
+
     void (*r_input)(char) = receive_input; //function pointer
     foreground_process = r_input;
     printlnVGA("TERMINAL RUNNING!"); 
     printchar('>');
 
 
-    void (*c_com)(char) = sample_command; //function pointer
-
-    cmds[0].name = "sample";
-    cmds[0].command_pointer = sample_command;
-    cmds[1].name = "dample";
-    cmds[1].command_pointer = dample_command;
-
-
 }
+
+
+
+
 
 /*
     Instead of writing multiple "if-else" statements for each and every available command, 

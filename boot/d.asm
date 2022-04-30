@@ -4,6 +4,9 @@
 global _start
 _start:
     cli
+    mov ah,0x01
+    mov ch, 0x03F
+    int 0x10 ;lines 7-9 disable the cursor
     xor ax, ax
     mov ds, ax
     mov es, ax
@@ -11,7 +14,7 @@ _start:
     mov sp, MEM_POS 
     mov ax, ERROR_MSG2
     mov [BOOT_DRIVE], dl; Boot drive passed to us by the BIOS
-    mov dh, 22        ; Number of sectors (kernel.bin) to read from disk
+    mov dh, 25        ; Number of sectors (kernel.bin) to read from disk
                         ; 17*512 allows for a kernel.bin up to 8704 bytes
     mov bx, MEM_POS      ; Load Kernel to ES:BX = 0x0000:0x9000  or 0x0000:0xA000 or.... 
     call load_kernel
