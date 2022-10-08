@@ -18,14 +18,7 @@ a20_gate_fast:
 
 enable_A20__done: 
     xor ax,ax
-    ;mov ah, 0x0e
-    ;mov si, A20success
-   ; mov al, [si]
-    ;call printmsg
     ret
-    ;jmp printmsg ;HERE
-    ;jmp load_gdt
-    ;call kernel_entry
     
     ;http://www.independent-software.com/operating-system-development-enabling-a20-line.html
     ; https://stackoverflow.com/questions/52668637/is-my-understanding-of-the-a20-line-check-code-correct

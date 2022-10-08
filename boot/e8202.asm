@@ -8,8 +8,6 @@ global do_e820
 	mov es,ax
     xor ebp, ebp			;/* entry number */
     xor ebx, ebx		;	/* ebx must be 0 to start */
-    ;mov edi, 0x1000		;/* e820 list(es:edi 0x07c0:0x1000) */  0x07c0*16 + 0x1000
-	;mov edi,  0xeb00	;/* e820 list(es:edi 0x0000:0xeb00) */  0xeb000  ;TODO: VRES GIATI DEN DOUPEVE
 	mov edi, 0x00000B00 ; es:edi 0x07c0:0x1000     H 0x0000:0xA000 K.O.K
 .loopy_e820:
 	mov edx, 0x0534D4150		;/* magical number: "SMAP" */
