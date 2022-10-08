@@ -40,7 +40,7 @@ struct boot_param *myboot_param;
 unsigned long memory_end = 0;
 unsigned long available_memory = 0;
 unsigned long unavailable_memory = 0;
-
+unsigned long i, num ;
 
 void boot_memory_init()
 {
@@ -53,7 +53,7 @@ void boot_memory_init()
   entry =  &myboot_param->memMapp;
 
 
-  unsigned int i, num = &myboot_param->e820_num; //apo th stigmh pou to myboot_param einai sto bss, prepei kai to num na einai sto bss. Eidallws den emfanizetai.
+  num = &myboot_param->e820_num; //apo th stigmh pou to myboot_param einai sto bss, prepei kai to num na einai sto bss. Eidallws den emfanizetai swsta.
   //TODO: Des an to parapanw pianetai gia normal
 
 	/*
@@ -71,15 +71,15 @@ void boot_memory_init()
 			available_memory +=  entry[i].length;
     }
 	}
-	printlnVGA("Available memory: ");
+	printlnVGA("Available memory for processes: ");
   str = itoa(available_memory / (1024*1024), str, 10); 
   printlnVGA(str);
 
-  /*printlnVGA("Unavailable memory: ");
-  str = itoa(unavailable_memory / (1024*1024), str, 10); 
-  printlnVGA(str);
-*/
+	/*printlnVGA("Non E820_TYPE_FREE memory: ");
+  str = itoa(unavailable_memory / (1024*1024), str, 10); //page in mbs
+  printlnVGA(str);*/
 
+  	printlnVGA("Total E820_TYPE_FREE memory: ");
   str = itoa(memory_end / (1024*1024), str, 10); //page in mbs
   printlnVGA(str);
 

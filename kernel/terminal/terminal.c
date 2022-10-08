@@ -17,7 +17,7 @@ char fetch_args(char inserted_chars[], char args[], int cmd_name_ending_position
     }
 }
 
-
+//Calls a function pointer with an array of arguments
 void run_foreground_process(char args[]){
     if(foreground_process!=0){
         typedef void func();
@@ -44,6 +44,10 @@ void run_command(char *inserted_chars){
         j=0;
         cmd_not_found = 0;
 
+        /*
+            The while-loop below takes care of the comparison.
+
+        */
         while(cmds[i].name[j] != 0 && cmd_not_found==0){
             if( (int)(cmds[i].name[j] ^ inserted_chars[j]) != 0){
                 cmd_not_found=1;
@@ -51,16 +55,16 @@ void run_command(char *inserted_chars){
             j++;
         }
 
-        if(!cmd_not_found){
+        if(!cmd_not_found){ //if command found
             char args[32];
 
+            void (*cmd)() = cmds[i].command_pointer; //find the function pointer to the command
+            calling_foreground_process = foreground_process; //store the address of the terminal for returning
+            foreground_process = cmd; //and bring the command to the foreground. 
+            //Keep in mind that as of 5/2022 this project does not support parallelism and at most one process can run at a time
 
-            void (*cmd)() = cmds[i].command_pointer; //function pointer
-            calling_foreground_process = foreground_process;
-            foreground_process = cmd;
-
-            fetch_args(inserted_chars, args, j);
-            run_foreground_process(args);
+            fetch_args(inserted_chars, args, j); //get the arguments after the command
+            run_foreground_process(args); //and call the command with them
             foreground_process = calling_foreground_process; //return to terminal
 
             break;

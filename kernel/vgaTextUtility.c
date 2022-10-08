@@ -141,11 +141,14 @@ void printchar(unsigned char *msg){
       vga_buffer[xPos] = vga_entry(msg, BRIGHT_GREEN, BLACK);
     xPos++;
   }
+
   if(msg=='\n'){
       xPos +=  (MaxXInitial -1);
   }
     single_chars++;
 }
+
+
 void println_serious_error(unsigned char *msg){
 
   unsigned int i=0;

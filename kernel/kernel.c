@@ -22,9 +22,11 @@ void main(){
     //char *address = (char *)0x7000;
     unsigned char myString[] = "Kernel running";
     printlnVGA(myString);
+    printlnVGA("");
 
     boot_memory_init();
     //TODO: Initialize paging
+    printlnVGA("");
 
     PIC_remap();
     initialize_pic();

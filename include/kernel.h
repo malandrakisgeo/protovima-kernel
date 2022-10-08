@@ -18,7 +18,15 @@ typedef unsigned long long ulong64;
 
 #define VADDR(pa)	((pa) + KERNEL_BASE)
 #define NULL 0
-#define E820_TYPE_FREE		1
+
+#define E820_TYPE_FREE		1 //https://uefi.org/sites/default/files/resources/ACPI_4_Errata_A.pdf, pg. 477
+#define E820_TYPE_RESERVED  2
+#define E820_TYPE_ACPI_RECLAIM  3
+#define E820_TYPE_NVS  4
+#define E820_TYPE_UNUSUABLE 5
+#define E820_TYPE_DISABLED  6
+
+
 #define PGSIZE	0x1000
 #define VGA_ADDRESS2	((void *)VADDR(VGA_ORIGINAL))
 

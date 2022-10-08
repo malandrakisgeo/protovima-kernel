@@ -46,7 +46,7 @@ typedef struct memory_entry {
 
 struct boot_param {
 	struct e820_entry memMapp[256];
-	unsigned int e820_num;
+	unsigned long e820_num;
 };
 
 extern void boot_memory_init();
