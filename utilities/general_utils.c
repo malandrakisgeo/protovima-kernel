@@ -30,13 +30,13 @@ char* char_append(char dest[], char src)
 }
 
 
-char* clear_command(char dest[])
+char* clear_command(char *dest)
 {
    int i = 0, j = 0;
-   while (dest[i] != 0 && dest[i] !='0x00'){
+   while (dest[i] != 0x00 ){
       dest[i] = 0x00;
       ++i;
-   } 
+   }
 
    //dest[++i] = '\0';
    return dest;

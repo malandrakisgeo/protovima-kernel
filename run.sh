@@ -24,7 +24,7 @@
 #new way: 
 make clean
 make all 
-qemu-system-i386 -m 2096M -fda os.img 
+qemu-system-i386 -m 436M -fda os.img 
 
 
 

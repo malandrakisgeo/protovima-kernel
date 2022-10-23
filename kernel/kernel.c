@@ -25,7 +25,8 @@ void main(){
     printlnVGA("");
 
     boot_memory_init();
-    //TODO: Initialize paging
+    initialize_paging();
+
     printlnVGA("");
 
     PIC_remap();
@@ -35,6 +36,7 @@ void main(){
     irq_install();
        // int l = 1/0; //test for division-by-zero exception
        //keyboard_in_use = 1;
+
        start_terminal();
 
     while(1) __asm__("hlt\n\t");

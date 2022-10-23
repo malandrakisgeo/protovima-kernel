@@ -10,11 +10,15 @@ char command[32];
 struct command_pointer cmds[32] ;
 
 
-char fetch_args(char inserted_chars[], char args[], int cmd_name_ending_position){
+char* fetch_args(char inserted_chars[], int cmd_name_ending_position){
     int i = cmd_name_ending_position, j=0;
+    char args[32];
+
     while(inserted_chars[i]!=0){
         args[j++] = inserted_chars[i++];
     }
+
+    return args;
 }
 
 //Calls a function pointer with an array of arguments
@@ -36,9 +40,9 @@ void run_foreground_process(char args[]){
 
     TODO: Learn better C and find a less retarded way to achieve this
 */
-void run_command(char *inserted_chars){
+void run_command(char inserted_chars[]){
 
-    int cmd_not_found = 0;
+    int cmd_not_found;
     int j;
     for(int i =0; i<32; i++){
         j=0;
@@ -56,14 +60,13 @@ void run_command(char *inserted_chars){
         }
 
         if(!cmd_not_found){ //if command found
-            char args[32];
 
             void (*cmd)() = cmds[i].command_pointer; //find the function pointer to the command
             calling_foreground_process = foreground_process; //store the address of the terminal for returning
             foreground_process = cmd; //and bring the command to the foreground. 
             //Keep in mind that as of 5/2022 this project does not support parallelism and at most one process can run at a time
 
-            fetch_args(inserted_chars, args, j); //get the arguments after the command
+            char* args = fetch_args(inserted_chars, j); //get the arguments after the command
             run_foreground_process(args); //and call the command with them
             foreground_process = calling_foreground_process; //return to terminal
 
@@ -73,12 +76,10 @@ void run_command(char *inserted_chars){
 
     if(cmd_not_found==1){
             printlnVGA("Command not found."); 
-            return;
     }
 
 
     return;
-
 }
 
 void receive_input(char ch){
@@ -100,7 +101,7 @@ void sample_command(){
     return;
 }
 
-void dample_command(char ch[]){
+void dample_command(char *ch){
     if(ch[0]!=0){
         printlnVGA("You inserted the arguments: ");
         printlnVGA(ch);
@@ -111,19 +112,74 @@ void dample_command(char ch[]){
     return;
 }
 
+/*int malloc_commanddd (char *s)
+{
+            if(s[0]==48){  //0 48   9 57
+                            printlnVGA(s);
+        printlnVGA("No arguments inserted.");
+
+            }
+
+    char *p = (char *)s;
+    int sum = 0;
+
+    if (*p == '-' || *p == '+') p++;
+
+    while (*p >= '0' && *p <= '9') {
+        sum = sum * 10 - (*p - '0');
+        p++;
+    }
+
+            printitoa(sum, 10);
+
+    return (int)sum;
+
+}
+*/
+
+void malloc_command(char *size){ 
+
+
+        int rc = 0;
+        unsigned i = 1; //0 is a space
+        // C guarantees that '0'-'9' have consecutive values
+        while (size[i] != 0  && size[i] !='0x00') {   
+
+            if( size[i] >= 48 && size[i] <= 57){
+                rc *= 10;
+                rc += (size[i] - 48);
+               
+             }
+              ++i;
+        }
+
+    printitoa(rc, 10);
+
+    malloc(rc);
+
+    return;
+}
+
+void clear_terminal_command(){
+    clear();
+    return;
+}
 
 
 
 void register_commands(){
              typedef void func(char);
-        func* dmp = (func*)dample_command;
+        //func* dmp = (func*)dample_command;
 
 
     cmds[0].name = "sample";
     cmds[0].command_pointer = sample_command;
     cmds[1].name = "dample";
     cmds[1].command_pointer = dample_command;
-
+    cmds[2].name = "malloc";
+    cmds[2].command_pointer = malloc_command;
+    cmds[3].name = "clear";
+    cmds[3].command_pointer = clear_terminal_command;
 }
 
 /*

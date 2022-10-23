@@ -1,11 +1,11 @@
 #include "kernel.h"
 #include "vgaTextUtility.h" 
 
-unsigned int xPos=0;
-unsigned int yPos=0;
-unsigned int single_chars=0;
+static unsigned int xPos=0;
+static unsigned int yPos=0;
+static unsigned int single_chars=0;
 
-uint16* vga_buffer;
+static uint16* vga_buffer;
 /*
 16 bit video buffer elements(register ax)
 8 bits(ah) higher : 
@@ -45,6 +45,7 @@ void clear_vga_buffer(uint16 **buffer, uint8 fore_color, uint8 back_color)
   for(i = 0; i < BUFSIZE; i++){
     (*buffer)[i] = vga_entry(NULL, fore_color, back_color);
   }
+  return;
 }
 
 //initialize vga buffer
@@ -54,6 +55,7 @@ void init_vga(uint8 fore_color, uint8 back_color)
    yPos = 0;
   vga_buffer = (uint16*)(VGA_ADDRESS);  //point vga_buffer pointer to VGA_ADDRESS 
   clear_vga_buffer(&vga_buffer, fore_color, back_color);  //clear buffer
+  return;
 }
 
 
@@ -117,6 +119,17 @@ int println(unsigned char *text){
   yPos++;
 }
 */
+
+void clear(){
+  for(int i=0; i<xPos; i++){
+   vga_buffer[i] = 0;
+  }
+    //clear_vga_buffer(&vga_buffer, fore_color, back_color);  //clear buffer
+
+  xPos=0;
+  yPos=0;
+  single_chars=0;
+}
 void printlnVGA(unsigned char *msg){
 
   unsigned int i=0;
@@ -133,6 +146,14 @@ void printlnVGA(unsigned char *msg){
   }
   xPos += ( MaxXInitial - i);
   yPos++;
+  return;
+}
+
+void printitoa(long i, int base){
+  unsigned char *str;
+  str = itoa(i, str, base);
+  printlnVGA(str);
+  return;
 }
 
 

@@ -7,7 +7,11 @@ INC_DIR = .
 # The option -ffreestanding directs the compiler 
 # to not assume that standard functions 
 # have their usual definition
-CFLAGS= -fno-pic -fno-pie -fno-exceptions -Wno-multichar -Wno-int-conversion -Wno-implicit-function-declaration -nostdlib -nostdinc -fno-builtin -fno-stack-protector -nostartfiles -nodefaultlibs -ffreestanding -m32 -g  -I include/
+#CFLAGS= -fno-pic -fno-pie -fno-exceptions -Wno-multichar -Wno-int-conversion -Wno-implicit-function-declaration -nostdlib -nostdinc -fno-builtin -fno-stack-protector -nostartfiles -nodefaultlibs -ffreestanding -m32 -g -c  -I include/
+
+CLANGFLAGS = --target=i386-pc-none-elf  -c -g  -nostdlib -nodefaultlibs -mcmodel=kernel -I include/ -Wall -Wno-pointer-sign -Wno-unused-variable -Wno-unused-function 
+#CLANGFLAGS = --target=i386-pc-none-elf  -c  -g -nostdlib -nodefaultlibs -mcmodel=large   -I include/ 
+
 
 # Convert the *.c filenames to *.o to give a list of object files to build
 OBJ = ${C_SOURCES:.c=.o }
@@ -26,7 +30,9 @@ OBJ2 = ${kernel/kernel.c:.c=.o }
 # rather than absolute internel memory references.
 # $< is the first dependancy and $@ is the target file
 %.o: %.c
-	gcc ${CFLAGS} -c $< -o $@
+	#gcc ${CFLAGS} -c $< -o $@
+	
+	clang ${CLANGFLAGS} -c $< -o $@
 
 # The option -f elf tells the assembler 
 # to output an object file of the particular format Executable 
@@ -64,17 +70,18 @@ OBJ2 = ${kernel/kernel.c:.c=.o }
 # The final ELF will have following format .text - .rodata - .data
 # $^ is substituted with all of the target's dependancy files
 
+
+kernel.bin: kernel/kernel_entry.o kernel/cpu/interrupt_routines.o  ${OBJ} 
+	ld -m elf_i386 -o $@ -T linker.ld  $^ --oformat binary
+	#clang -target i386-pc-none-elf  -T linker.ld $^ -o  $@  -g3
+	#ld -m elf_i386 -o $@ -Ttext 0x9000  $^ --oformat binary
+
+
 kernel.buf: ${OBJ2}
 	#gcc -m32 -ffreestanding -o kernel.buf kernel/kernel.c 
 	gcc -g -m32 -c -ffreestanding -o kernel.o kernel/kernel.c -lgcc
 	ld -melf_i386 -T kernel/linker.ld -nostdlib --nmagic -o kernel.buf kernel.o
 	#objcopy -O binary kernel.elf kernel.buf
-
-
-kernel.bin: kernel/kernel_entry.o kernel/cpu/interrupt_routines.o  ${OBJ} 
-	ld -m elf_i386 -o $@ -T linker.ld  $^ --oformat binary
-	
-	#ld -m elf_i386 -o $@ -Ttext 0x1000  $^ --oformat binary
 
 # Used for debugging purposes
 kernel.elf: kernel/kernel_entry.o kernel/cpu/interrupt_routines.o ${OBJ} ${O_src}

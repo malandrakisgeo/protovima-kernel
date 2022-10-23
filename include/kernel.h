@@ -31,7 +31,7 @@ typedef unsigned long long ulong64;
 #define VGA_ADDRESS2	((void *)VADDR(VGA_ORIGINAL))
 
 
-
+#define current_page_table_size 1024
 
 
 
