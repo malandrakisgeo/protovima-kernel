@@ -209,7 +209,7 @@ void *malloc(long size)
 
   //TODO: Elegxe an uparxei diathesimh mnhmh sto dothen size eksarxhs
   volatile contiguous_mem_struct *allocated_memory = (struct contiguous_mem_struct *)page_alloc(); //first entry
-  volatile contiguous_mem_struct *entry = allocated_memory;                                        //an den uparxei enas epipleon pointer pros to arxiko allocated_memory, to first tha deixnei stongamo tou karagkiozh. O compiler lamvanei ta metra tou an uparxoun polloi pointer se mia dieuthinsh
+  //volatile contiguous_mem_struct *entry = allocated_memory;                                        //an den uparxei enas epipleon pointer pros to arxiko allocated_memory, to first tha deixnei stongamo tou karagkiozh. O compiler lamvanei ta metra tou an uparxoun polloi pointer se mia dieuthinsh
   volatile contiguous_mem_struct *first = allocated_memory;
   //printitoa(first->unused_page->virtual_address_start, 10);// An to clang den exei -c kai mcmodel=large option, dhmiourgei provlhma.
 
@@ -217,6 +217,16 @@ void *malloc(long size)
   { //runs only if at least 2 allocations are necessary
     allocated_memory->next = (struct contiguous_mem_struct *)page_alloc();
     allocated_memory = allocated_memory->next;
+  }
+  printlnVGA("Virtual addresses of the first pages (at most 3): ");
+  printitoa(first->unused_page->virtual_address_start, 10);
+  if (first->next != 0)
+  {
+    printitoa(first->next->unused_page->virtual_address_start, 10);
+    if (first->next->next != 0)
+    {
+      printitoa(first->next->next->unused_page->virtual_address_start, 10);
+    }
   }
 
   return first;
