@@ -3,18 +3,19 @@
 extern int foreground_process;
 extern int calling_foreground_process;
 
-extern char* char_append(char dest[], char src[]);
-extern char* clear_command(char dest[]);
+extern char *char_append(char dest[], char src[]);
+extern char *clear_command(char dest[]);
 
 char command[32];
-struct command_pointer cmds[32] ;
+struct command_pointer cmds[32];
 
-
-char* fetch_args(char inserted_chars[], int cmd_name_ending_position){
-    int i = cmd_name_ending_position, j=0;
+char *fetch_args(char inserted_chars[], int cmd_name_ending_position)
+{
+    int i = cmd_name_ending_position, j = 0;
     char args[32];
 
-    while(inserted_chars[i]!=0){
+    while (inserted_chars[i] != 0)
+    {
         args[j++] = inserted_chars[i++];
     }
 
@@ -22,10 +23,12 @@ char* fetch_args(char inserted_chars[], int cmd_name_ending_position){
 }
 
 //Calls a function pointer with an array of arguments
-void run_foreground_process(char args[]){
-    if(foreground_process!=0){
+void run_foreground_process(char args[])
+{
+    if (foreground_process != 0)
+    {
         typedef void func();
-        func* f = (func*)foreground_process;
+        func *f = (func *)foreground_process;
         f(args);
     }
 }
@@ -40,72 +43,85 @@ void run_foreground_process(char args[]){
 
     TODO: Learn better C and find a less retarded way to achieve this
 */
-void run_command(char inserted_chars[]){
+void run_command(char inserted_chars[])
+{
 
     int cmd_not_found;
     int j;
-    for(int i =0; i<32; i++){
-        j=0;
+    for (int i = 0; i < 32; i++)
+    {
+        j = 0;
         cmd_not_found = 0;
 
         /*
             The while-loop below takes care of the comparison.
 
         */
-        while(cmds[i].name[j] != 0 && cmd_not_found==0){
-            if( (int)(cmds[i].name[j] ^ inserted_chars[j]) != 0){
-                cmd_not_found=1;
+        while (cmds[i].name[j] != 0 && cmd_not_found == 0)
+        {
+            if ((int)(cmds[i].name[j] ^ inserted_chars[j]) != 0)
+            {
+                cmd_not_found = 1;
             }
             j++;
         }
 
-        if(!cmd_not_found){ //if command found
+        if (!cmd_not_found)
+        { //if command found
 
-            void (*cmd)() = cmds[i].command_pointer; //find the function pointer to the command
+            void (*cmd)() = cmds[i].command_pointer;         //find the function pointer to the command
             calling_foreground_process = foreground_process; //store the address of the terminal for returning
-            foreground_process = cmd; //and bring the command to the foreground. 
+            foreground_process = cmd;                        //and bring the command to the foreground.
             //Keep in mind that as of 5/2022 this project does not support parallelism and at most one process can run at a time
 
-            char* args = fetch_args(inserted_chars, j); //get the arguments after the command
-            run_foreground_process(args); //and call the command with them
+            char *args = fetch_args(inserted_chars, j);      //get the arguments after the command
+            run_foreground_process(args);                    //and call the command with them
             foreground_process = calling_foreground_process; //return to terminal
 
             break;
         }
     }
 
-    if(cmd_not_found==1){
-            printlnVGA("Command not found."); 
+    if (cmd_not_found == 1)
+    {
+        printlnVGA("Command not found.");
     }
-
 
     return;
 }
 
-void receive_input(char ch){
-        if(ch!='\n'){
-            char_append(command, ch);
-            printchar(ch);
-        }else{
-            //printlnVGA(ch);
-            //printlnVGA(command);
-            run_command(command);
-            clear_command(command);
-            printchar('>');
-        }
-    
+void receive_input(char ch)
+{
+    if (ch != '\n')
+    {
+        char_append(command, ch);
+        printchar(ch);
+    }
+    else
+    {
+        //printlnVGA(ch);
+        //printlnVGA(command);
+        run_command(command);
+        clear_command(command);
+        printchar('>');
+    }
 }
 
-void sample_command(){
+void sample_command()
+{
     printlnVGA("Sample command ran!");
     return;
 }
 
-void dample_command(char *ch){
-    if(ch[0]!=0){
+void dample_command(char *ch)
+{
+    if (ch[0] != 0)
+    {
         printlnVGA("You inserted the arguments: ");
         printlnVGA(ch);
-    }else{
+    }
+    else
+    {
         printlnVGA("No arguments inserted.");
     }
 
@@ -137,21 +153,22 @@ void dample_command(char *ch){
 }
 */
 
-void malloc_command(char *size){ 
+void malloc_command(char *size)
+{
 
+    int rc = 0;
+    unsigned i = 1; //0 is a space
+    // C guarantees that '0'-'9' have consecutive values
+    while (size[i] != 0 && size[i] != '0x00')
+    {
 
-        int rc = 0;
-        unsigned i = 1; //0 is a space
-        // C guarantees that '0'-'9' have consecutive values
-        while (size[i] != 0  && size[i] !='0x00') {   
-
-            if( size[i] >= 48 && size[i] <= 57){
-                rc *= 10;
-                rc += (size[i] - 48);
-               
-             }
-              ++i;
+        if (size[i] >= 48 && size[i] <= 57)
+        {
+            rc *= 10;
+            rc += (size[i] - 48);
         }
+        ++i;
+    }
 
     printitoa(rc, 10);
 
@@ -160,17 +177,16 @@ void malloc_command(char *size){
     return;
 }
 
-void clear_terminal_command(){
+void clear_terminal_command()
+{
     clear();
     return;
 }
 
-
-
-void register_commands(){
-             typedef void func(char);
-        //func* dmp = (func*)dample_command;
-
+void register_commands()
+{
+    typedef void func(char);
+    //func* dmp = (func*)dample_command;
 
     cmds[0].name = "sample";
     cmds[0].command_pointer = sample_command;
@@ -186,26 +202,21 @@ void register_commands(){
     It creates a struct that links command names to memory addresses.
 */
 
-void start_terminal(){
+void start_terminal()
+{
     register_commands();
 
     void (*r_input)(char) = receive_input; //function pointer
     foreground_process = r_input;
-    printlnVGA("TERMINAL RUNNING!"); 
+    printlnVGA("TERMINAL RUNNING!");
     printchar('>');
-
-
 }
-
-
-
-
 
 /*
     Instead of writing multiple "if-else" statements for each and every available command, 
     we will write a single function that makes sure every command ends up running the function with its' name if it exists, otherwise prints and error.
 
 */
-void link_commands_to_functions(){
-
+void link_commands_to_functions()
+{
 }
