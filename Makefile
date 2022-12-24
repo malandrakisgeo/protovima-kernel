@@ -1,7 +1,8 @@
 # Automatically generate lists of sources using wildcards
 C_SOURCES = $(wildcard kernel/*.c kernel/process/*.c kernel/memory/*.c  kernel/cpu/*.c utilities/*.c kernel/terminal/*.c)
 O_src = $(wildcard utilities/*.o kernel/*.o kernel/cpu/*.o kernel/process/*.o  kernel/memory/*.o  kernel/terminal/*.o)
-
+#
+#
 
 INC_DIR = .
 # The option -ffreestanding directs the compiler 
@@ -9,8 +10,9 @@ INC_DIR = .
 # have their usual definition
 #CFLAGS= -fno-pic -fno-pie -fno-exceptions -Wno-multichar -Wno-int-conversion -Wno-implicit-function-declaration -nostdlib -nostdinc -fno-builtin -fno-stack-protector -nostartfiles -nodefaultlibs -ffreestanding -m32 -g -c  -I include/
 
-CLANGFLAGS = --target=i386-pc-none-elf  -c -g  -nostdlib -nodefaultlibs -mcmodel=kernel -I include/ -Wall -Wno-pointer-sign -Wno-unused-variable -Wno-unused-function 
-#CLANGFLAGS = --target=i386-pc-none-elf  -c  -g -nostdlib -nodefaultlibs -mcmodel=large   -I include/ 
+CLANGFLAGS = --target=i386-pc-none-elf  -mcmodel=small -I include/ -Wall -Wno-pointer-sign -Wno-unused-variable -Wno-unused-function 
+
+#CLANGFLAGS = --target=i386-pc-none-elf  -c -g  -nostdlib -nodefaultlibs -mcmodel=small -I include/ -Wall -Wno-pointer-sign -Wno-unused-variable -Wno-unused-function 
 
 
 # Convert the *.c filenames to *.o to give a list of object files to build
@@ -51,7 +53,6 @@ OBJ2 = ${kernel/kernel.c:.c=.o }
 # into absolute addresses within the aggregated machine code
 
 # The -Ttext option puts the .text section of your program by the given address.
-# We set its value to KERNEL_OFFSET we define in boot_sect.asm
 
 # the linker can output executable files in various formats
 # some of which may retain meta data from the input object files.
@@ -84,7 +85,7 @@ kernel.buf: ${OBJ2}
 	#objcopy -O binary kernel.elf kernel.buf
 
 # Used for debugging purposes
-kernel.elf: kernel/kernel_entry.o kernel/cpu/interrupt_routines.o ${OBJ} ${O_src}
+kernel.elf: kernel/kernel_entry.o kernel/cpu/interrupt_routines.o ${OBJ} 
 	ld -m elf_i386 -o $@ -Ttext 0x1000 $^
 
 # Assemble the boot sector to raw machine code

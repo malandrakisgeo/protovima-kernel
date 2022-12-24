@@ -31,17 +31,17 @@
 //TODO: Ftiakse kati antistoixo tou OOM killer gia th periptwsh pou h diathesimh mnhmh peftei se epipeda katw tou 5%
 
 static unsigned int max_pages;
-static volatile struct contiguous_mem_entries *avail_mem_entries;
+static  struct contiguous_mem_entries *avail_mem_entries;
 static struct e820_entry *entry;
 static struct boot_param *myboot_param;
-static unsigned long available_unpaged_memory = 0;
+static unsigned long available_unpaged_memory = 0; //in bytes
 
 //unsigned long unavailable_memory = 0;
 //unsigned long memory = 0;
-static volatile unsigned long total_ram = 0;
+static  unsigned long total_ram = 0;
 static long memory_end = 0;
 
-static volatile contiguous_mem_struct *next_free_page;
+static  contiguous_mem_struct *next_free_page;
 
 void boot_memory_init()
 {
@@ -123,11 +123,8 @@ void *page_memory_alloc()
     1024*2*32 for the page_table
 
   */
-  /* unsigned char *str; //for the itoa
-  str = itoa(avail_mem_entries->entries[0].length / (1024), str, 10); 
-  printlnVGA(str);*/
 
-  available_unpaged_memory -= 196608;
+  available_unpaged_memory -= (FREE_PAGE_TABLE_SIZE/8) ;//bits to bytes. 196608;
   available_unpaged_memory -= 65535;
 
   return avail_mem_entries->entries[0].start_addr; //adressen som ska användas till vår första page-tabell
@@ -168,70 +165,117 @@ void initialize_paging()
   for (int i = 1; i <= current_page_table_size; i++)
   {
     current_free_page->unused_page = (struct page *)(page_table_address + FREE_PAGE_TABLE_SIZE + (i * PAGE_SIZE)); //address of the next page
-    current_free_page->unused_page->virtual_address_start = current_free_page->unused_page;                        //same as physical. TODO: fix it
-    current_free_page->next = (struct free_page *)(page_table_address + (i * FREE_PAGE_STRUCTURE_SIZE));
+    current_free_page->unused_page->start_address = current_free_page->unused_page;                        //same as physical. TODO: fix it
+    current_free_page->next = (struct free_page *)(page_table_address + (i * CONT_MEM_STRUCT_SIZE));
 
     current_free_page = current_free_page->next;
     available_unpaged_memory -= PAGE_SIZE;
   }
 
-  current_free_page->next = 0; //The last available free_page does not point somewhere.
+  current_free_page->next = NULL; //The last available free_page does not point somewhere.
   next_free_page = free_page_head;
 }
 
 void *page_alloc()
 {
+  if (available_unpaged_memory < PAGE_SIZE)
+  {
+    printlnVGA("NOT ENOUGH MEMORY!");
+    return 0;
+  }
+
+  if (next_free_page->next == NULL)
+  {
+    printlnVGA("NO FREE PAGE LEFT");
+    return 0;
+  }
+  available_unpaged_memory -= PAGE_SIZE;
   contiguous_mem_struct *page_entry_to_be_used = next_free_page;
 
   next_free_page = next_free_page->next;
 
   page_entry_to_be_used->next = NULL;
-  if (next_free_page->next == NULL)
-  {
-    printlnVGA("NO FREE PAGE");
-  }
+    page_entry_to_be_used->next->next = NULL;
+  page_entry_to_be_used->next->unused_page = NULL;
 
   return page_entry_to_be_used; //prev. page_entry_to_be_used->unused_page
 }
 
-//Allocates a contiguous chunk of memory -i.e. page entries for a process.
 
-void *malloc(long size)
-{
+/*
+  Allocates a contiguous chunk of memory -i.e. page entries for a process.
+  I was reluctant to call it malloc, since malloc is a C-library function that relies on system calls 
+  to the underlying OS in order to get memory, not a kernel functionality itself.
 
-  long a = size / PAGE_SIZE;
-  int b = size % PAGE_SIZE;
+  This can either be called by a process (future plan), or manually by a user for testing. 
+  In the latter case, some output messages are printed.
+
+*/
+void *malloc(long size_in_bytes, int called_by_process) 
+{   
+    
+
+  if (available_unpaged_memory < size_in_bytes)
+  {
+    printlnVGA("NOT ENOUGH MEMORY!");
+    return 0;
+  }
+
+  long a = size_in_bytes / PAGE_SIZE;
+  int b = size_in_bytes % PAGE_SIZE;
 
   if (b > 0)
   {
     a++;
   }
+   contiguous_mem_struct *allocated_memory = (struct contiguous_mem_struct *)page_alloc(); //first entry
 
-  //TODO: Elegxe an uparxei diathesimh mnhmh sto dothen size eksarxhs
-  volatile contiguous_mem_struct *allocated_memory = (struct contiguous_mem_struct *)page_alloc(); //first entry
-  //volatile contiguous_mem_struct *entry = allocated_memory;                                        //an den uparxei enas epipleon pointer pros to arxiko allocated_memory, to first tha deixnei stongamo tou karagkiozh. O compiler lamvanei ta metra tou an uparxoun polloi pointer se mia dieuthinsh
-  volatile contiguous_mem_struct *first = allocated_memory;
-  //printitoa(first->unused_page->virtual_address_start, 10);// An to clang den exei -c kai mcmodel=large option, dhmiourgei provlhma.
+   contiguous_mem_struct *first = allocated_memory;
+  //printitoa(first->unused_page->start_address, 10);// An to clang den exei -c kai mcmodel=large option, dhmiourgei provlhma.
 
   for (int i = 1; i < a; i++)
   { //runs only if at least 2 allocations are necessary
     allocated_memory->next = (struct contiguous_mem_struct *)page_alloc();
     allocated_memory = allocated_memory->next;
   }
-  printlnVGA("Virtual addresses of the first pages (at most 3): ");
-  printitoa(first->unused_page->virtual_address_start, 10);
-  if (first->next != 0)
-  {
-    printitoa(first->next->unused_page->virtual_address_start, 10);
-    if (first->next->next != 0)
+
+   contiguous_mem_struct *last = first;
+
+  while (last->next != NULL)
+  {  
+    last = last->next;
+  }
+
+
+  if(called_by_process==0){ //show messages only if the user called it directly as a command
+    printlnVGA("Physical addresses of the first pages (at most 3): ");
+    printitoa(first->unused_page->start_address, 10);
+    if (first->next != 0)
     {
-      printitoa(first->next->next->unused_page->virtual_address_start, 10);
+      printitoa(first->next->unused_page->start_address, 10);
+      if (first->next->next != 0)
+      {
+        printitoa(first->next->next->unused_page->start_address, 10);
+      }
     }
+    printlnVGA("Last page: ");
+    printitoa(last->unused_page->start_address, 10);
   }
 
   return first;
 }
 
-void dealloc(int address)
+void dealloc(contiguous_mem_struct *allocated_mem_struct)
 {
+
+  while(allocated_mem_struct->next!=0){
+    next_free_page->next = allocated_mem_struct;
+    available_unpaged_memory += PAGE_SIZE;
+    allocated_mem_struct = allocated_mem_struct->next;
+  }
+
+    next_free_page->next = allocated_mem_struct;
+    available_unpaged_memory += PAGE_SIZE;
+
 }
+

@@ -12,7 +12,7 @@ a20_gate_fast:
     ;mov si,A20errorMsg
     ;call printmsg
     mov bx , ERROR_MSG  ;v3
-    call print_string  ;v3
+    ;call print_string  ;v3
     call a20_gate_fast
     
 

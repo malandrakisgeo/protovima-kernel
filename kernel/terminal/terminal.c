@@ -5,6 +5,7 @@ extern int calling_foreground_process;
 
 extern char *char_append(char dest[], char src[]);
 extern char *clear_command(char dest[]);
+extern void *malloc(long a, int b);
 
 char command[32];
 struct command_pointer cmds[32];
@@ -172,7 +173,7 @@ void malloc_command(char *size)
 
     printitoa(rc, 10);
 
-    malloc(rc);
+    malloc(rc, 0);
 
     return;
 }

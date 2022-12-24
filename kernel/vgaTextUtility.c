@@ -127,6 +127,7 @@ void clear()
   xPos = 0;
   yPos = 0;
   single_chars = 0;
+  return;
 }
 void printlnVGA(unsigned char *msg)
 {
@@ -170,6 +171,7 @@ void printchar(unsigned char *msg)
     xPos += (MaxXInitial - 1);
   }
   single_chars++;
+  return;
 }
 
 void println_serious_error(unsigned char *msg)
@@ -199,6 +201,7 @@ void printchVGA(unsigned char *msg)
   }
   xPos += (i);
   yPos++;
+  return;
 }
 
 /*void writechar(unsigned char c, unsigned char forecolour, unsigned char backcolour, int x, int y)

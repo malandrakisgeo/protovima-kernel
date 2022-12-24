@@ -1,11 +1,11 @@
 
 
-#define FRAME_SIZE 4096 //physical memory
-#define PAGE_SIZE 4096 //virtual memory
+#define FRAME_SIZE 4096 //physical memory, bytes
+#define PAGE_SIZE 4096 //virtual memory, bytes
 #define FREE_PAGE_ENTRIES 1024
-#define FREE_PAGE_STRUCTURE_SIZE 64 //a contiguous_mem_struct (nee free_page) structure consists of two long ints
+#define CONT_MEM_STRUCT_SIZE 64 //a contiguous_mem_struct (nee free_page) structure consists of two long ints, or 64 bits
 
-#define FREE_PAGE_TABLE_SIZE FREE_PAGE_ENTRIES*FREE_PAGE_STRUCTURE_SIZE //virtual memory
+#define FREE_PAGE_TABLE_SIZE FREE_PAGE_ENTRIES*CONT_MEM_STRUCT_SIZE //bits
 
 #define PROCESS_MEMORY_START_ADDRESS 0x9000 //TODO: Create a memory map 
 
@@ -17,7 +17,7 @@ typedef struct phys_mem_frame{
 
 //total 48bits
 typedef struct page{
-    long int *virtual_address_start; //32bits
+    long int *start_address; //32bits
     int flags; //16bits
 }page;
 
@@ -37,7 +37,7 @@ typedef struct page_table{ //FOR FUTURE USE
 typedef struct e820_entry {
 	unsigned int addr;
 	unsigned int addr_high;
-	unsigned int length;
+	unsigned int length; //in bytes
 	unsigned int length_high;
 	unsigned int type;
 	unsigned int pad;
@@ -61,3 +61,8 @@ struct boot_param {
 extern void boot_memory_init();
 
 
+void boot_memory_init();
+void *page_alloc();
+void *malloc(long size_in_bytes, int called_by_user);
+void initialize_paging();
+void *page_memory_alloc();
