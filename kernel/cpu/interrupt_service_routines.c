@@ -35,7 +35,7 @@ extern void _irq14();
 extern void _irq15();
 
 extern void keyboard_handler_int();
-
+extern void general_keyboard_handler(unsigned char scancode);
 extern int keyboard_in_use;
 
 void *irq_routines[16] = {0};
@@ -89,8 +89,8 @@ void irq_handler(struct pushed_values* regs){
 	}
 
 	if(regs->int_no == 33){
-		unsigned int scancode = inb(0x60); //xwris to inb skalwnei xwris na dexetai deutero interrupt.
-		general_keyboard_handler(scancode);
+		unsigned char scancode = inb(0x60); //xwris to inb skalwnei xwris na dexetai deutero interrupt.
+		general_keyboard_handler((long) scancode);
 
 	}
 

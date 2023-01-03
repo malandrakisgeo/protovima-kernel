@@ -1,4 +1,5 @@
 
+#pragma once
 #define MASTER_PIC_COMMAND 0x0020
 #define MASTER_PIC_DATA 0x0021
 #define SLAVE_PIC_COMMAND 0x00A0

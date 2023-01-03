@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef KERNEL_H
 #define KERNEL_H
 
@@ -9,11 +11,12 @@ typedef unsigned long long ulong64;
 
 #define MaxYInitial 25
 #define MaxXInitial 80
+#define KERNEL_BASE	0x7000
+
 
 #define VGA_ADDRESS 0xB8000 //Default for colour monitors. TODO: Check if it actually is just for the Real mode, and the protected has some more effective way than VGA access
 #define E820_ADDRESS 0x0B00 
 #define BUFSIZE 2200
-#define KERNEL_BASE	0x10000
 
 
 #define VADDR(pa)	((pa) + KERNEL_BASE)
