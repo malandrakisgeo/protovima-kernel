@@ -1,4 +1,7 @@
+#pragma once
+
 #include "cpu.h"
+#include "commands.h"
 
 
 enum process_status{
@@ -8,49 +11,36 @@ enum process_status{
     WAITING //The process is waiting for some event to occur
 }; //POSIX-compliant
 
-enum thread_status{
-    THREAD_BLOCKED,
-    THREAD_READY,
-    THREAD_RUNNING,
-    THREAD_DELAYED,
-    THREAD_WAITING,
-    THREAD_EXITING
-};
+typedef struct exec_image {
+	 void* text_address; //i.e. a function pointer
+	//unsigned long heap; //future use
+	//unsigned long stack;
+}exec_image;
 
 
-typedef struct pv_thread {
-    uint32 thread_id; //mallon tha einai akeraios pou antistoixei sto n. 1 gia prwto thread, 2 gia 2o k.o.k...
-	struct pushed_values registers;
-    struct pv_process *parent_process;
-    enum thread_status status;
-	struct pv_thread *previous_thread; 
-	struct pv_thread *next_thread; 
-    uint32 program_counter; //address of the next instruction. TODO: Des an to theloume.
 
-}pv_thread;
-
-
-typedef  struct pv_process {
-    uint32 id;
-    uint32 total_threads;
+typedef struct  pv_process{
+    int pid;
     enum process_status status;
-	struct pv_thread *threads; //todo: Na deixnei panta to prwto arage? 
-    //TODO: add files,
+    //TODO: add files, threads, etc
+    struct cpu_state registers; //TODO: choose between cpu_state and pushed_values
+    long int creation_timestamp;
+    struct exec_image image;
     struct pv_process *parent_process;
-    struct pv_process *child_processes; 
+    struct pv_process *child_processes_list; 
 }pv_process;
 
+typedef struct child_processes_list{
+   pv_process process;
+   struct pv_process *next;
+}child_processes_list;
 
-struct sys_processes{
+struct sys_processes_table{
     struct pv_process *processes;
 };
 
 
 
-struct pv_process *add_process(void *object_file);
-void *remove_process(struct pv_process *pv_process);
+struct pv_process create_process(void *code);
+void run_process(struct pv_process *pv_process, char args[]);
 
-struct pv_process create_thread(struct pv_process *pv_process);
-void remove_thread(struct pv_thread *pv_thread);
-int thread_join(struct pv_thread *thread);
-int thread_yield(struct pv_thread *release_cpu_for_this_thread);

@@ -1,6 +1,11 @@
 
 #include "kernel.h"
 #include "interrupt_service_routines.h"
+#include "process.h";
+#include "memoryManager.h"
+#include "vgaTextUtility.h"
+#include "commands.h"
+
 
 /* Written for the older version of PROTOVIMA. 
     This code will be placed at the beginning of the object by the linker script   
@@ -9,9 +14,9 @@
          ".popsection\r\n"
          );  */
 
-extern start_terminal();
+extern void start_terminal();
 
-int foreground_process = 0;
+int foreground_process = 0; //the address of the process currently appearing -either for receiving input, or for printing it.
 int calling_foreground_process = 0;
 
 void main()
@@ -24,8 +29,7 @@ void main()
     printlnVGA(myString);
     printlnVGA("");
 
-    boot_memory_init();
-    initialize_paging();
+    boot_memory_init(); 
 
     printlnVGA("");
 
@@ -34,8 +38,10 @@ void main()
     initialize_idt();
     isr_install();
     irq_install();
+
     // int l = 1/0; //test for division-by-zero exception
-    //keyboard_in_use = 1;
+    
+    initialize_paging();
 
     start_terminal();
 

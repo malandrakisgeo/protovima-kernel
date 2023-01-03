@@ -1,3 +1,4 @@
+#pragma once
 #include "cpu.h"
 #include "idt.h"
 

@@ -1,3 +1,5 @@
+#pragma once
+
 #include "kernel.h"
 
 struct cpu_state {

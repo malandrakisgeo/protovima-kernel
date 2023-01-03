@@ -1,4 +1,5 @@
 //lowlevel&osdev&minios&tinyos
+#pragma once
 #include "kernel.h"
 
 /* 

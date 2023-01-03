@@ -14,7 +14,7 @@ _start:
     mov sp, MEM_POS 
     mov ax, ERROR_MSG2
     mov [BOOT_DRIVE], dl; Boot drive passed to us by the BIOS
-    mov dh, 30        ; Number of sectors (kernel.bin) to read from disk
+    mov dh, 50        ; Number of sectors (kernel.bin) to read from disk
                         ; 17*512 allows for a kernel.bin up to 8704 bytes
     mov bx, MEM_POS      ; Load Kernel to ES:BX = 0x0000:0x9000  or 0x0000:0xA000 or.... 
     call load_kernel
@@ -107,7 +107,7 @@ BOOT_DRIVE:      db 0
 
 VIDEO_MEMORY_SEG equ 0xb800
 WHITE_ON_BLACK   equ 0x0f
-MEM_POS equ 0x1000 ;;An to allakseis kai katalhsei sto gamo tou karagkiozh, 
+MEM_POS equ 0x9000 ;;An to allakseis kai katalhsei sto gamo tou karagkiozh, 
 ;tha emfanizontai mono prokathorismenes times sta println. Toutestin, mono o,ti exei 
 ;mpei apo ton compiler sto stack, kai oxi o,ti tha evgaine sto runtime
 

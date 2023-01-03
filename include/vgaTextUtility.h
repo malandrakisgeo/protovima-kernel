@@ -1,10 +1,9 @@
-//uint16* vga_buffer;
+#pragma once
 
-//unsigned int xPos;
-//unsigned int yPos;
+#include "kernel.h"
 
 
- uint16 vga_entry(unsigned char ch, uint8 fore_color, uint8 back_color);
+ unsigned short vga_entry(unsigned char ch, uint8 fore_color, uint8 back_color);
 
 //clear video buffer array
  void clear_vga_buffer(uint16 **buffer, uint8 fore_color, uint8 back_color);
@@ -13,7 +12,7 @@
  void init_vga(uint8 fore_color, uint8 back_color);
 
 
- unsigned char *itoa( unsigned long value, unsigned char * str, unsigned int base );
+ unsigned char *itoaa( unsigned long value, unsigned char * str, unsigned int base );
 
 
  int println(unsigned char *text);

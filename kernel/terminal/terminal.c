@@ -1,4 +1,4 @@
-#include "commands.h"
+#include "terminal.h"
 
 extern int foreground_process;
 extern int calling_foreground_process;
@@ -6,14 +6,15 @@ extern int calling_foreground_process;
 extern char *char_append(char dest[], char src[]);
 extern char *clear_command(char dest[]);
 extern void *malloc(long a, int b);
+extern  void printlnVGA(unsigned char *msg);
 
 char command[32];
 struct command_pointer cmds[32];
+ char args[32];
 
-char *fetch_args(char inserted_chars[], int cmd_name_ending_position)
+char* fetch_args(char inserted_chars[], int cmd_name_ending_position)
 {
     int i = cmd_name_ending_position, j = 0;
-    char args[32];
 
     while (inserted_chars[i] != 0)
     {
@@ -24,14 +25,21 @@ char *fetch_args(char inserted_chars[], int cmd_name_ending_position)
 }
 
 //Calls a function pointer with an array of arguments
-void run_foreground_process(char args[])
+void run_foreground_process(char * args)
 {
-    if (foreground_process != 0)
+/*if (foreground_process != 0)
     {
         typedef void func();
         func *f = (func *)foreground_process;
-        f(args);
+        f(&args);
+    }*/
+   
+    if (foreground_process != 0){
+        pv_process pp = create_process((void*)foreground_process);
+        run_process(&pp, args);
     }
+    return;
+
 }
 
 /*
@@ -44,7 +52,7 @@ void run_foreground_process(char args[])
 
     TODO: Learn better C and find a less retarded way to achieve this
 */
-void run_command(char inserted_chars[])
+void run_command(unsigned char * inserted_chars)
 {
 
     int cmd_not_found;
@@ -74,8 +82,13 @@ void run_command(char inserted_chars[])
             calling_foreground_process = foreground_process; //store the address of the terminal for returning
             foreground_process = cmd;                        //and bring the command to the foreground.
             //Keep in mind that as of 5/2022 this project does not support parallelism and at most one process can run at a time
-
+  
             char *args = fetch_args(inserted_chars, j);      //get the arguments after the command
+              printlnVGA(args);
+                            printlnVGA(inserted_chars);
+
+                            printlnVGA("args");
+
             run_foreground_process(args);                    //and call the command with them
             foreground_process = calling_foreground_process; //return to terminal
 
@@ -100,8 +113,6 @@ void receive_input(char ch)
     }
     else
     {
-        //printlnVGA(ch);
-        //printlnVGA(command);
         run_command(command);
         clear_command(command);
         printchar('>');
@@ -129,34 +140,9 @@ void dample_command(char *ch)
     return;
 }
 
-/*int malloc_commanddd (char *s)
-{
-            if(s[0]==48){  //0 48   9 57
-                            printlnVGA(s);
-        printlnVGA("No arguments inserted.");
-
-            }
-
-    char *p = (char *)s;
-    int sum = 0;
-
-    if (*p == '-' || *p == '+') p++;
-
-    while (*p >= '0' && *p <= '9') {
-        sum = sum * 10 - (*p - '0');
-        p++;
-    }
-
-            printitoa(sum, 10);
-
-    return (int)sum;
-
-}
-*/
-
 void malloc_command(char *size)
 {
-
+        printitoa(size[1], 10);
     int rc = 0;
     unsigned i = 1; //0 is a space
     // C guarantees that '0'-'9' have consecutive values
@@ -208,7 +194,7 @@ void start_terminal()
     register_commands();
 
     void (*r_input)(char) = receive_input; //function pointer
-    foreground_process = r_input;
+    foreground_process = (int )r_input;
     printlnVGA("TERMINAL RUNNING!");
     printchar('>');
 }

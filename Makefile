@@ -8,9 +8,9 @@ INC_DIR = .
 # The option -ffreestanding directs the compiler 
 # to not assume that standard functions 
 # have their usual definition
-#CFLAGS= -fno-pic -fno-pie -fno-exceptions -Wno-multichar -Wno-int-conversion -Wno-implicit-function-declaration -nostdlib -nostdinc -fno-builtin -fno-stack-protector -nostartfiles -nodefaultlibs -ffreestanding -m32 -g -c  -I include/
+CFLAGS=   -fno-pic -fno-pie -fno-exceptions -Wno-multichar -Wno-int-conversion -Wno-implicit-function-declaration -nostdlib -nostdinc -fno-builtin -fno-stack-protector -nostartfiles -nodefaultlibs  -m32 -g -c  -I include/
 
-CLANGFLAGS = --target=i386-pc-none-elf  -mcmodel=small -I include/ -Wall -Wno-pointer-sign -Wno-unused-variable -Wno-unused-function 
+#CLANGFLAGS = --target=i386-pc-none-elf  -mcmodel=small -I include/ -Wall -Wno-pointer-sign -Wno-unused-variable -Wno-unused-function  -Wnoimplicit-function-declaration
 
 #CLANGFLAGS = --target=i386-pc-none-elf  -c -g  -nostdlib -nodefaultlibs -mcmodel=small -I include/ -Wall -Wno-pointer-sign -Wno-unused-variable -Wno-unused-function 
 
@@ -32,9 +32,9 @@ OBJ2 = ${kernel/kernel.c:.c=.o }
 # rather than absolute internel memory references.
 # $< is the first dependancy and $@ is the target file
 %.o: %.c
-	#gcc ${CFLAGS} -c $< -o $@
+	gcc ${CFLAGS} -c $< -o $@
 	
-	clang ${CLANGFLAGS} -c $< -o $@
+	#clang ${CLANGFLAGS} -c $< -o $@
 
 # The option -f elf tells the assembler 
 # to output an object file of the particular format Executable 

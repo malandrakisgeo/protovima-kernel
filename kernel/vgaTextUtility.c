@@ -1,4 +1,3 @@
-#include "kernel.h"
 #include "vgaTextUtility.h"
 
 static unsigned int xPos = 0;
@@ -56,7 +55,7 @@ void init_vga(uint8 fore_color, uint8 back_color)
   return;
 }
 
-unsigned char *itoa(unsigned long value, unsigned char *str, unsigned int base)
+unsigned char *itoaa(unsigned long value, unsigned char *str, unsigned int base)
 {
   unsigned char *rc;
   unsigned char *ptr;
@@ -153,7 +152,7 @@ void printlnVGA(unsigned char *msg)
 void printitoa(long i, int base)
 {
   unsigned char *str;
-  str = itoa(i, str, base);
+  str = itoaa(i, str, base);
   printlnVGA(str);
   return;
 }

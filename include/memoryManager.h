@@ -1,3 +1,5 @@
+#pragma once
+
 
 
 #define FRAME_SIZE 4096 //physical memory, bytes
@@ -8,6 +10,9 @@
 #define FREE_PAGE_TABLE_SIZE FREE_PAGE_ENTRIES*CONT_MEM_STRUCT_SIZE //bits
 
 #define PROCESS_MEMORY_START_ADDRESS 0x9000 //TODO: Create a memory map 
+
+#ifndef MEMORY_STRUCTS
+#define MEMORY_STRUCTS
 
 
 typedef struct phys_mem_frame{
@@ -49,17 +54,16 @@ typedef struct memory_entry {
 	short reserved;
 }memory_entry;
 
-struct contiguous_mem_entries{
+typedef struct contiguous_mem_entries{
 	struct memory_entry entries[256]; //definitely no more than the e820 entries
 } contiguous_mem_entries;
 
-struct boot_param {
+typedef struct boot_param {
 	struct e820_entry memMapp[256];
 	unsigned long e820_num;
 };
 
-extern void boot_memory_init();
-
+#endif
 
 void boot_memory_init();
 void *page_alloc();

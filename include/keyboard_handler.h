@@ -1,5 +1,7 @@
 //https://stackoverflow.com/questions/37618111/keyboard-irq-within-an-x86-kernel
 
+#pragma once
+
 unsigned char keyboard_map[256] =
 {
     0,  27, '1', '2', '3', '4', '5', '6', '7', '8',     /* 9 */
