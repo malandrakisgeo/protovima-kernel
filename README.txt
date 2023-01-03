@@ -1,8 +1,8 @@
 My first step in kernel programming. More of a playground than an actual project.
 
-Goal: a kernel providing a shell with some basic commands. 
+Goal: a kernel managing the CPU, interrupts, memory, processes, etc, along with a shell with some basic commands. 
 
-Supposed to run on any single-core CPU with an i386 architecture. 
+Meant to run on any single-core CPU with an i386 architecture. 
 
 ==========================
 
