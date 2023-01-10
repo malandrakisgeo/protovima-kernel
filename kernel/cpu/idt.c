@@ -6,7 +6,7 @@ void load_idt(void*);
 void initialize_idt(){
     idtr.limit = 256*sizeof(idt_entry_t) -1;
     idtr.base = (unsigned int)&idt;
-    //__asm__ volatile ("lidt %0" :: "m" (idtr)); //TODO: Kolla hur det här fungerar och varför 
+    __asm__ volatile ("lidt %0" :: "m" (idtr)); //TODO: Kolla hur det här fungerar och varför 
     load_idt(&idtr); //Me th parapanw grammh doulevan ta isr, alla oxi kai ta irq! Giati?? Me auth ola popa pantws.
 }
 

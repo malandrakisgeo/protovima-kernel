@@ -8,6 +8,19 @@ Meant to run on any single-core CPU with an i386 architecture.
 
 DISCLAIMER: C is not my cup of tea, so be prepared for some weird code here.
 
+
+==========================
+
+How to run: 
+
+All you need is gcc, nasm, and ld for building, and qemu for running.
+
+If unable to use ./run.sh, do this:
+make clean
+make all 
+qemu-system-i386 -m 500M -fda os.img 
+
+
 ==========================
 
 Bootloader&Makefile largely based on::

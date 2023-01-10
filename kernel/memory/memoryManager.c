@@ -3,32 +3,10 @@
 #include "memoryManager.h"
 
 /*
-
-    Ksekiname me available-memory kai base_address ths.
-
-    Gia kathe malloc desmevoume to antistoixo kommati
-    mnhmhs ksekinwntas apo base_address kai to afairoume apo available-memory.
-    An ftasoume sto final_address kai den uparxei kai available-memory
-    , petaei error. An uparxei... desmevoume to "akriano" kommati mnhmhs
-    kai pame pisw sto base_address psaxnontas kati eleuthero...
-
-    Menei omws to pws psaxnoume ta eleuthera kommatia. Me brute-force? Mhpws einai polus xronos
-    gia p.x. 32 gb?
-    H mhpws na dhmiourghsoume ena array gia ta apodesmeuthenta kommatia
-     mnhmhs wste na desmeuoume kateutheian apo ekei? Auto to array tha sunista mia apoklish
-     alla oxi gia polu, afou kathe malloc/calloc tha koitazei prwta ekei pera.
-
-    Fun fact: Kathe mem_entry pianei mnhmh, opote prwta to dhmiourgoume kai meta rwtame
-    posh mnhmh exei eleutherh. Timh sto mem_entry.address ktl dinoume meta.
-
-*/
-
-/*
  PhysicalAddress = Segment * 16 + Offset.
  12F3:4B27 corresponds to the physical address 0x17A57
 */
 
-// TODO: Ftiakse kati antistoixo tou OOM killer gia th periptwsh pou h diathesimh mnhmh peftei se epipeda katw tou 5%
 
 static unsigned int max_pages;
 static struct contiguous_mem_entries *avail_mem_entries;
@@ -36,7 +14,7 @@ static struct e820_entry *entry;
 static struct boot_param *myboot_param;
 static unsigned long available_unpaged_memory = 0; // in bytes
 
-// unsigned long unavailable_memory = 0;
+// unsigned long unavailable_memory = 0; //debugging purposes
 // unsigned long memory = 0;
 static unsigned long total_ram = 0;
 static long memory_end = 0;
@@ -67,7 +45,7 @@ void boot_memory_init()
   for (i = 0; i < num; i++)
   {
     if (entry[i].type != E820_TYPE_FREE)
-    { // TODO: Des ti sumvainei me th mh-diathesimh mnhmh kai giati mexri 3gb einai diathesima enw ta alla desmevontai.
+    { 
       // unavailable_memory +=  entry[i].length; //debugging purposes
       continue;
     }
