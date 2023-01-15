@@ -8,11 +8,11 @@
 */
 
 
-static unsigned int max_pages;
-static struct contiguous_mem_entries *avail_mem_entries;
-static struct e820_entry *entry;
-static struct boot_param *myboot_param;
-static unsigned long available_unpaged_memory = 0; // in bytes
+static volatile unsigned int max_pages;
+static volatile struct contiguous_mem_entries *avail_mem_entries;
+static volatile struct e820_entry *entry;
+static volatile struct boot_param *myboot_param;
+static volatile unsigned long available_unpaged_memory = 0; // in bytes
 
 // unsigned long unavailable_memory = 0; //debugging purposes
 // unsigned long memory = 0;
@@ -163,7 +163,7 @@ void *page_alloc()
   In the latter case, some output messages are printed.
 
 */
-void *malloc(long size_in_bytes, int called_by_process)
+volatile void *malloc(long size_in_bytes, int called_by_process)
 {
 
   if (available_unpaged_memory < size_in_bytes)
@@ -172,48 +172,48 @@ void *malloc(long size_in_bytes, int called_by_process)
     return 0;
   }
 
-  long a = size_in_bytes / PAGE_SIZE;
-  int b = size_in_bytes % PAGE_SIZE;
+  long total_pages = size_in_bytes / PAGE_SIZE; //num of pages
+  int b = size_in_bytes % PAGE_SIZE; //possible extra page
 
   if (b > 0)
   {
-    a++;
+    total_pages++;
   }
   contiguous_mem_struct *allocated_memory = (struct contiguous_mem_struct *)page_alloc(); // first entry
 
-  contiguous_mem_struct *first = allocated_memory;
+  contiguous_mem_struct *first_allocated_block = allocated_memory;
   // printitoa(first->unused_page->start_address, 10);// An to clang den exei -c kai mcmodel=large option, dhmiourgei provlhma.
 
-  for (int i = 1; i < a; i++)
+  for (int i = 1; i < total_pages; i++)
   { // runs only if at least 2 allocations are necessary
     allocated_memory->next = (struct contiguous_mem_struct *)page_alloc();
     allocated_memory = allocated_memory->next;
   }
 
-  contiguous_mem_struct *last = first;
+  contiguous_mem_struct *last_allocated_block = first_allocated_block; //uses the first as a starting point
 
-  while (last->next != NULL)
+  while (last_allocated_block->next != NULL)
   {
-    last = last->next;
+    last_allocated_block = last_allocated_block->next;
   }
 
-  if (called_by_process == 0)
-  { // show messages only if the user called it directly as a command
+  if (called_by_process == 0) // show these messages only if the user called it directly as a command
+  { 
     printlnVGA("Physical addresses of the first pages (at most 3): ");
-    printitoa(first->unused_page->start_address, 10);
-    if (first->next != 0)
+    printitoa(first_allocated_block->unused_page->start_address, 10);
+    if (first_allocated_block->next != 0)
     {
-      printitoa(first->next->unused_page->start_address, 10);
-      if (first->next->next != 0)
+      printitoa(first_allocated_block->next->unused_page->start_address, 10);
+      if (first_allocated_block->next->next != 0)
       {
-        printitoa(first->next->next->unused_page->start_address, 10);
+        printitoa(first_allocated_block->next->next->unused_page->start_address, 10);
       }
     }
     printlnVGA("Last page: ");
-    printitoa(last->unused_page->start_address, 10);
+    printitoa(last_allocated_block->unused_page->start_address, 10);
   }
 
-  return first;
+  return first_allocated_block;
 }
 
 void dealloc(contiguous_mem_struct *allocated_mem_struct)

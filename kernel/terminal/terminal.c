@@ -191,11 +191,3 @@ void start_terminal()
     printchar('>');
 }
 
-/*
-    Instead of writing multiple "if-else" statements for each and every available command, 
-    we will write a single function that makes sure every command ends up running the function with its' name if it exists, otherwise prints and error.
-
-*/
-void link_commands_to_functions()
-{
-}

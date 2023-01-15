@@ -67,6 +67,6 @@ typedef struct boot_param {
 
 void boot_memory_init();
 void *page_alloc();
-void *malloc(long size_in_bytes, int called_by_user);
+volatile void *malloc(long size_in_bytes, int called_by_user);
 void initialize_paging();
 void *page_memory_alloc();
