@@ -84,11 +84,6 @@ void run_command(unsigned char * inserted_chars)
             //Keep in mind that as of 5/2022 this project does not support parallelism and at most one process can run at a time
   
             char *args = fetch_args(inserted_chars, j);      //get the arguments after the command
-              printlnVGA(args);
-                            printlnVGA(inserted_chars);
-
-                            printlnVGA("args");
-
             run_foreground_process(args);                    //and call the command with them
             foreground_process = calling_foreground_process; //return to terminal
 
@@ -141,8 +136,7 @@ void dample_command(char *ch)
 }
 
 void malloc_command(char *size)
-{
-        printitoa(size[1], 10);
+{   
     int rc = 0;
     unsigned i = 1; //0 is a space
     // C guarantees that '0'-'9' have consecutive values
@@ -156,8 +150,6 @@ void malloc_command(char *size)
         }
         ++i;
     }
-
-    printitoa(rc, 10);
 
     malloc(rc, 0);
 
