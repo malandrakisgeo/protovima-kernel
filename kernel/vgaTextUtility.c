@@ -1,8 +1,8 @@
 #include "vgaTextUtility.h"
 
-static unsigned int xPos = 0;
+static  unsigned int xPos = 0;
 static unsigned int yPos = 0;
-static unsigned int single_chars = 0;
+static  unsigned int single_chars = 0;
 
 static uint16 *vga_buffer;
 /*
@@ -93,27 +93,6 @@ unsigned char *itoaa(unsigned long value, unsigned char *str, unsigned int base)
   return rc;
 }
 
-int strlen(const char *str) //BSD implementation
-{
-  const char *s;
-
-  for (s = str; *s; ++s)
-    ;
-  return (s - str);
-}
-
-/* TODO: Check it
-int println(unsigned char *text){
-  int i, l;
-  for (i = 0; i < strlen(text); i++)
-    {
-      vga_buffer[xPos] = vga_entry(text[i], BRIGHT_GREEN, BLACK);
-      xPos++;
-    }
-  xPos += ( MaxXInitial - strlen(text));
-  yPos++;
-}
-*/
 
 void clear()
 {
@@ -128,6 +107,7 @@ void clear()
   single_chars = 0;
   return;
 }
+
 void printlnVGA(unsigned char *msg)
 {
 
@@ -159,17 +139,24 @@ void printitoa(long i, int base)
 
 void printchar(unsigned char *msg)
 {
-  if (msg != NULL && msg != '0x00')
+  if (msg != NULL && msg != '0x00'  && msg != '\b' )
   {
     vga_buffer[xPos] = vga_entry(msg, BRIGHT_GREEN, BLACK);
-    xPos++;
+  
   }
 
   if (msg == '\n')
   {
-    xPos += (MaxXInitial - 1);
+    xPos += (MaxXInitial - single_chars);
+    single_chars = 0;
+  }else if(msg == '\b'){ //backspace
+    xPos-=1;
+    single_chars--;
+    vga_buffer[xPos] = 0x00;
+  }else{
+    xPos++;
+    single_chars++;
   }
-  single_chars++;
   return;
 }
 
@@ -188,7 +175,7 @@ void println_serious_error(unsigned char *msg)
   halt_cpu();
 }
 
-void printchVGA(unsigned char *msg)
+/*void printchVGA(unsigned char *msg)
 {
 
   unsigned int i = 0;
@@ -201,23 +188,79 @@ void printchVGA(unsigned char *msg)
   xPos += (i);
   yPos++;
   return;
+}*/
+
+void printchVGA(unsigned char *msg)
+{
+
+ 
+  if (single_chars != 0)
+  {
+    xPos -= (single_chars);
+    single_chars = 0;
+  }
+  unsigned int i = 0;
+
+  while (msg[i] != NULL && msg[i] != '0x00')
+  {
+    vga_buffer[xPos] = vga_entry(msg[i], BRIGHT_GREEN, BLACK);
+    i++;
+    xPos++;
+  }
+  xPos -= i;
+
+  return;
 }
 
-/*void writechar(unsigned char c, unsigned char forecolour, unsigned char backcolour, int x, int y)
+
+
+void print_msg(unsigned char *msg)
 {
-     uint16 attrib = (backcolour << 4) | (forecolour & 0x0F);
-     volatile uint16 * where;
-     where = (volatile uint16 *)VGA_ADDRESS + (y * 80 + x) ;
-     *where = c | (attrib << 8);
+    unsigned int i = 0;
+  while (msg[i] != NULL && msg[i] != '0x00'  && msg[i] != '\b')
+  {
+    vga_buffer[xPos++] = vga_entry(msg[i++], BRIGHT_GREEN, BLACK);
+    single_chars++;
+  }
+
+ 
+  return;
 }
 
-void writeline(unsigned char *msg)
-{
-  int x=0;
-  int y=1;
-     while(msg[x] != NULL && msg[x] !='00'){
-       writechar(&msg[x], BRIGHT_GREEN, BLACK, x, y);
-       ++x;
-     }
+
+
+
+void remove_written_message_before_newline2(unsigned char *msg){
+  unsigned int i = 0;
+
+  do{
+    xPos--;
+    vga_buffer[xPos] = 0x00;
+    single_chars--;
+    
+    i++;
+  }while((msg[i] != NULL && msg[i] != '0x00'));
+  
+  return;
 }
-*/
+
+
+int strlen(const char *str) //BSD implementation
+{
+  const char *s;
+
+  for (s = str; *s; ++s)
+    ;
+  return (s - str);
+}
+
+void remove_written_message_before_newline(unsigned char *msg){
+  --xPos;
+  --single_chars;
+    for(int i=0; i<=strlen(msg); i++){
+      vga_buffer[xPos--] = 0x00;
+        --single_chars;
+
+    }
+  return;
+}

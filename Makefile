@@ -1,5 +1,5 @@
 # Automatically generate lists of sources using wildcards
-C_SOURCES = $(wildcard kernel/*.c kernel/process/*.c kernel/memory/*.c  kernel/cpu/*.c utilities/*.c kernel/terminal/*.c)
+C_SOURCES = $(wildcard utilities/*.c  kernel/*.c kernel/process/*.c kernel/memory/*.c  kernel/cpu/*.c kernel/terminal/*.c)
 O_src = $(wildcard utilities/*.o kernel/*.o kernel/cpu/*.o kernel/process/*.o  kernel/memory/*.o  kernel/terminal/*.o)
 #
 #
@@ -11,8 +11,6 @@ INC_DIR = .
 CFLAGS=   -fno-pic -fno-pie -fno-exceptions -Wno-multichar -Wno-int-conversion -Wno-implicit-function-declaration -nostdlib -nostdinc -fno-builtin -fno-stack-protector -nostartfiles -nodefaultlibs  -m32 -g -c  -I include/
 
 #CLANGFLAGS = --target=i386-pc-none-elf  -mcmodel=small -I include/ -Wall -Wno-pointer-sign -Wno-unused-variable -Wno-unused-function  -Wnoimplicit-function-declaration
-
-#CLANGFLAGS = --target=i386-pc-none-elf  -c -g  -nostdlib -nodefaultlibs -mcmodel=small -I include/ -Wall -Wno-pointer-sign -Wno-unused-variable -Wno-unused-function 
 
 
 # Convert the *.c filenames to *.o to give a list of object files to build
@@ -75,7 +73,6 @@ OBJ2 = ${kernel/kernel.c:.c=.o }
 kernel.bin: kernel/kernel_entry.o kernel/cpu/interrupt_routines.o  ${OBJ} 
 	ld -m elf_i386 -o $@ -T linker.ld  $^ --oformat binary
 	#clang -target i386-pc-none-elf  -T linker.ld $^ -o  $@  -g3
-	#ld -m elf_i386 -o $@ -Ttext 0x9000  $^ --oformat binary
 
 
 kernel.buf: ${OBJ2}
@@ -96,16 +93,15 @@ boot_sect.bin: ./boot/d.asm
 	nasm $< -f bin -i ./boot/ -o $@
 
 
-
 # This is the actual disk image that the computer loads ,
 # which is the combination of our compiled bootsector and kernel
 os.img: boot_sect.bin  kernel.bin 
 	cat $^ > $@
 
-# Default build target .
 all: os.img
 
-debug: kernel.elf
+
+debug: kernel.dis
 
 # Disassemble our kernel - might be useful for debugging
 kernel.dis: kernel.bin

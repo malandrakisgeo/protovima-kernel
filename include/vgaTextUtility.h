@@ -20,6 +20,7 @@
  void printlnVGA(unsigned char *msg);
 
  void printchVGA(unsigned char *msg);
+ void remove_written_message_before_newline(unsigned char *msg);
 
  /*void writechar(unsigned char c, unsigned char forecolour, unsigned char backcolour, int x, int y);
 

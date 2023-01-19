@@ -1,16 +1,39 @@
 #include "terminal.h"
+#include "vgaTextUtility.h"
 
 extern int foreground_process;
 extern int calling_foreground_process;
 
-extern char *char_append(char dest[], char src[]);
-extern char *clear_command(char dest[]);
-extern void *malloc(long a, int b);
-extern  void printlnVGA(unsigned char *msg);
+
 
 char command[32];
 struct command_pointer cmds[32];
- char args[32];
+char args[32];
+char previous_command;
+int previous_command_pointer=0;
+int command_history=0;
+static int inexistent_command =0 ;
+
+void command_history_handler(){
+    deepcopy_char_array(command, previous_command);
+   
+    return;
+} 
+
+void show_previous_command(){
+    if(previous_command_pointer!=0){
+        //do nothing.
+    }else{
+        remove_written_message_before_newline(command);
+        deepcopy_char_array(previous_command, command);
+        print_msg(command);
+
+        ++previous_command_pointer;
+    }
+    return;
+}
+
+
 
 char* fetch_args(char inserted_chars[], int cmd_name_ending_position)
 {
@@ -27,19 +50,11 @@ char* fetch_args(char inserted_chars[], int cmd_name_ending_position)
 //Calls a function pointer with an array of arguments
 void run_foreground_process(char * args)
 {
-/*if (foreground_process != 0)
-    {
-        typedef void func();
-        func *f = (func *)foreground_process;
-        f(&args);
-    }*/
-   
     if (foreground_process != 0){
         pv_process pp = create_process((void*)foreground_process);
         run_process(&pp, args);
     }
     return;
-
 }
 
 /*
@@ -52,64 +67,64 @@ void run_foreground_process(char * args)
 
     TODO: Learn better C and find a less retarded way to achieve this
 */
-void run_command(unsigned char * inserted_chars)
+void find_and_run(unsigned char * inserted_chars)
 {
-
-    int cmd_not_found;
-    int j;
-    for (int i = 0; i < 32; i++)
-    {
+     
+    int j, i;
+    inexistent_command=1;
+    for (i = 0; i < 32; i++) {
+        if(cmds[i].command_pointer == 0){ //if undefined command
+            break;
+        }
+        inexistent_command = 0;
         j = 0;
-        cmd_not_found = 0;
 
         /*
             The while-loop below takes care of the comparison.
-
         */
-        while (cmds[i].name[j] != 0 && cmd_not_found == 0)
+        while (cmds[i].name[j] != 0 && inexistent_command == 0 )  
         {
             if ((int)(cmds[i].name[j] ^ inserted_chars[j]) != 0)
             {
-                cmd_not_found = 1;
+                inexistent_command = 1; 
             }
             j++;
         }
 
-        if (!cmd_not_found)
+        if (inexistent_command == 0)
         { //if command found
-
             void (*cmd)() = cmds[i].command_pointer;         //find the function pointer to the command
             calling_foreground_process = foreground_process; //store the address of the terminal for returning
             foreground_process = cmd;                        //and bring the command to the foreground.
-            //Keep in mind that as of 5/2022 this project does not support parallelism and at most one process can run at a time
   
             char *args = fetch_args(inserted_chars, j);      //get the arguments after the command
             run_foreground_process(args);                    //and call the command with them
             foreground_process = calling_foreground_process; //return to terminal
-
-            break;
+            command_history_handler();
+            previous_command_pointer=0;
+            return;
         }
-    }
 
-    if (cmd_not_found == 1)
-    {
+    }
+    if (inexistent_command!=0){ //the loop has checked all commands and they are nothing like the one given.
         printlnVGA("Command not found.");
     }
-
-    return;
+     return;
 }
+
+
 
 void receive_input(char ch)
 {
-    if (ch != '\n')
-    {
-        char_append(command, ch);
+    if (ch != '\n' && ch != 24){ //newline or up
+        terminal_char_append(command, ch);
         printchar(ch);
-    }
-    else
-    {
-        run_command(command);
-        clear_command(command);
+    }else if(ch == 24){ //arrow up
+        show_previous_command(); //show the last command that ran successfully
+    }else if(ch == '\n'){
+        find_and_run(command);
+        clear_char_array(command);
+        clear_char_array(args);
         printchar('>');
     }
 }

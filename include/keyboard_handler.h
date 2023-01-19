@@ -24,7 +24,7 @@ unsigned char keyboard_map[256] =
     0,  /* 69 - Num lock*/
     0,  /* Scroll Lock */
     0,  /* Home key */
-    0,  /* Up Arrow */
+    24,  /* Up Arrow */
     0,  /* Page Up */
   '-',
     0,  /* Left Arrow */

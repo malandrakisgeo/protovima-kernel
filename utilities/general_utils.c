@@ -1,3 +1,5 @@
+#include "general_utils.h"
+
 char *concat(char dest[], char src[])
 {
    int i = 0, j = 0;
@@ -21,28 +23,42 @@ char *char_append1(char dest[], char src)
    return dest;
 }
 
-char *char_append(char dest[], char src)
+char *terminal_char_append(char dest[], char src)
 {
    int i = 0, j = 0;
    while (dest[i] != 0 && dest[i] != '0x00')
       ++i;
 
-   dest[i] = src;
+   if(src != '\b'){ //backspace
+         dest[i] = src;
+   }else{
+      dest[--i] = 0x00;
+   }
 
    //dest[++i] = '\0';
    return dest;
 }
 
-char *clear_command(char *dest)
+char *clear_char_array(char *dest)
 {
    int i = 0, j = 0;
    while (dest[i] != 0x00)
    {
-      dest[i] = 0x00;
-      ++i;
+      dest[i++] = 0x00;
    }
 
    //dest[++i] = '\0';
+   return dest[0];
+}
+
+char *deepcopy_char_array(char src[], char dest[])
+{
+   int i = 0, j = 0;
+   while (src[j])
+      dest[i++] = src[j++];
+   while(dest[i]){
+      dest[i++] = 0x00; //there can be extra chars
+   }
    return dest;
 }
 
