@@ -175,44 +175,6 @@ void println_serious_error(unsigned char *msg)
   halt_cpu();
 }
 
-/*void printchVGA(unsigned char *msg)
-{
-
-  unsigned int i = 0;
-  while (msg[i] != NULL && msg[i] != '00')
-  {
-    vga_buffer[xPos] = vga_entry(msg[i], BRIGHT_GREEN, BLACK);
-    i++;
-    xPos++;
-  }
-  xPos += (i);
-  yPos++;
-  return;
-}*/
-
-void printchVGA(unsigned char *msg)
-{
-
- 
-  if (single_chars != 0)
-  {
-    xPos -= (single_chars);
-    single_chars = 0;
-  }
-  unsigned int i = 0;
-
-  while (msg[i] != NULL && msg[i] != '0x00')
-  {
-    vga_buffer[xPos] = vga_entry(msg[i], BRIGHT_GREEN, BLACK);
-    i++;
-    xPos++;
-  }
-  xPos -= i;
-
-  return;
-}
-
-
 
 void print_msg(unsigned char *msg)
 {
@@ -228,21 +190,6 @@ void print_msg(unsigned char *msg)
 }
 
 
-
-
-void remove_written_message_before_newline2(unsigned char *msg){
-  unsigned int i = 0;
-
-  do{
-    xPos--;
-    vga_buffer[xPos] = 0x00;
-    single_chars--;
-    
-    i++;
-  }while((msg[i] != NULL && msg[i] != '0x00'));
-  
-  return;
-}
 
 
 int strlen(const char *str) //BSD implementation
