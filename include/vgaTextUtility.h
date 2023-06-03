@@ -12,7 +12,6 @@
  void init_vga(uint8 fore_color, uint8 back_color);
 
 
- unsigned char *itoaa( unsigned long value, unsigned char * str, unsigned int base );
 
 
  int println(unsigned char *text);

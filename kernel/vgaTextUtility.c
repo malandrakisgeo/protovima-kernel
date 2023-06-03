@@ -1,8 +1,8 @@
 #include "vgaTextUtility.h"
 
-static  unsigned int xPos = 0;
-static unsigned int yPos = 0;
-static  unsigned int single_chars = 0;
+static volatile unsigned int xPos = 0;
+static volatile unsigned int yPos = 0;
+static volatile unsigned int single_chars = 0;
 
 static uint16 *vga_buffer;
 /*
@@ -55,44 +55,6 @@ void init_vga(uint8 fore_color, uint8 back_color)
   return;
 }
 
-unsigned char *itoaa(unsigned long value, unsigned char *str, unsigned int base)
-{
-  unsigned char *rc;
-  unsigned char *ptr;
-  unsigned char *low;
-  // Check for supported base.
-  if (base < 2 || base > 36)
-  {
-    *str = '\0';
-    return str;
-  }
-  rc = ptr = str;
-  // Set '-' for negative decimals.
-  if (value < 0 && base == 10)
-  {
-    *ptr++ = '-';
-  }
-  // Remember where the numbers start.
-  low = ptr;
-  // The actual conversion.
-  do
-  {
-    // Modulo is negative for negative value. This trick makes abs() unnecessary.
-    *ptr++ = "zyxwvutsrqponmlkjihgfedcba9876543210123456789abcdefghijklmnopqrstuvwxyz"[35 + value % base];
-    value /= base;
-  } while (value);
-  // Terminating the string.
-  *ptr-- = '\0';
-  // Invert the numbers.
-  while (low < ptr)
-  {
-    unsigned char tmp = *low;
-    *low++ = *ptr;
-    *ptr-- = tmp;
-  }
-  return rc;
-}
-
 
 void clear()
 {
@@ -108,52 +70,44 @@ void clear()
   return;
 }
 
+
 void printlnVGA(unsigned char *msg)
 {
-
   unsigned int i = 0;
-  if (single_chars != 0)
-  {
-    xPos += (MaxXInitial - single_chars);
-    single_chars = 0;
-  }
 
-  while (msg[i] != NULL && msg[i] != '0x00')
+  while (msg[i] != NULL && msg[i] != '0x00' && msg[i] != '\n')
   {
-    vga_buffer[xPos] = vga_entry(msg[i], BRIGHT_GREEN, BLACK);
+    printchar(msg[i]);
     i++;
-    xPos++;
   }
-  xPos += (MaxXInitial - i);
-  yPos++;
+   printchar('\n');
+
   return;
 }
 
-void printitoa(long i, int base)
+void print_int_as_char(long i, int base)
 {
   unsigned char *str;
-  str = itoaa(i, str, base);
+  str = int_to_char(i, str, base);
   printlnVGA(str);
   return;
 }
 
 void printchar(unsigned char *msg)
 {
-  if (msg != NULL && msg != '0x00'  && msg != '\b' )
+  if (msg != NULL && msg != '0x00'  && msg != '\b' && msg != '\n' )
   {
     vga_buffer[xPos] = vga_entry(msg, BRIGHT_GREEN, BLACK);
-  
   }
 
-  if (msg == '\n')
-  {
+  if (msg == '\n') {
     xPos += (MaxXInitial - single_chars);
     single_chars = 0;
-  }else if(msg == '\b'){ //backspace
+  } else if(msg == '\b'){ //backspace
     xPos-=1;
     single_chars--;
     vga_buffer[xPos] = 0x00;
-  }else{
+  } else{
     xPos++;
     single_chars++;
   }
@@ -185,11 +139,8 @@ void print_msg(unsigned char *msg)
     single_chars++;
   }
 
- 
   return;
 }
-
-
 
 
 int strlen(const char *str) //BSD implementation

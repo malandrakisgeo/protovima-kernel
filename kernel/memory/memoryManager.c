@@ -16,8 +16,8 @@ static volatile unsigned long available_unpaged_memory = 0; // in bytes
 
 // unsigned long unavailable_memory = 0; //debugging purposes
 // unsigned long memory = 0;
-static unsigned long total_ram = 0;
-static long memory_end = 0;
+static volatile unsigned long total_ram = 0;
+static volatile  long memory_end = 0;
 
 static contiguous_mem_struct *next_free_page;
 
@@ -27,14 +27,13 @@ void boot_memory_init()
   volatile int contiguous_memory_total_entries = 0;
   volatile unsigned long i, num;
 
-  unsigned char *str; // for the itoaa
+  unsigned char *str; // for the int_to_char
 
   myboot_param = (struct boot_param *)(E820_ADDRESS);
 
   entry = &myboot_param->memMapp;
 
-  num = &myboot_param->e820_num; // apo th stigmh pou to myboot_param einai sto bss, prepei kai to num na einai sto bss. Eidallws den emfanizetai swsta.
-  // TODO: Des an to parapanw pianetai gia normal
+  num = &myboot_param->e820_num; 
 
   /*
    * We reserve memory below 1MB and use 820 map table
@@ -67,22 +66,22 @@ void boot_memory_init()
   }
 
   printlnVGA("Available memory for processes: ");
-  str = itoaa(available_unpaged_memory / (1024 * 1024), str, 10);
+  str = int_to_char(available_unpaged_memory / (1024 * 1024), str, 10);
   printlnVGA(str);
 
   printlnVGA("Total E820_TYPE_FREE memory: ");
-  str = itoaa(total_ram / (1024 * 1024), str, 10); // in mbs
+  str = int_to_char(total_ram / (1024 * 1024), str, 10); // in mbs
   printlnVGA(str);
 
   /* caculate the number of memory pages for processes */
   max_pages = available_unpaged_memory / PAGE_SIZE;
 
   printlnVGA("Maximum number of pages for processes: ");
-  str = itoaa(max_pages, str, 10); // pages
+  str = int_to_char(max_pages, str, 10); // pages
   printlnVGA(str);
 
   printlnVGA("MEMEND address: ");
-  str = itoaa(memory_end, str, 10);
+  str = int_to_char(memory_end, str, 10);
   printlnVGA(str);
   
   return;
@@ -125,7 +124,7 @@ void initialize_paging()
 
   current_free_page->next = NULL; // The last available free_page does not point somewhere.
   next_free_page = free_page_head;
-  printlnVGA("Paging initialized. ");
+  printlnVGA("Paging initialized.");
   return;
 }
 
@@ -200,17 +199,17 @@ volatile void *malloc(long size_in_bytes, int called_by_process)
   if (called_by_process == 0) // show these messages only if the user called it directly as a command
   { 
     printlnVGA("Physical addresses of the first pages (at most 3): ");
-    printitoa(first_allocated_block->unused_page->start_address, 10);
+    print_int_as_char(first_allocated_block->unused_page->start_address, 10);
     if (first_allocated_block->next != 0)
     {
-      printitoa(first_allocated_block->next->unused_page->start_address, 10);
+      print_int_as_char(first_allocated_block->next->unused_page->start_address, 10);
       if (first_allocated_block->next->next != 0)
       {
-        printitoa(first_allocated_block->next->next->unused_page->start_address, 10);
+        print_int_as_char(first_allocated_block->next->next->unused_page->start_address, 10);
       }
     }
     printlnVGA("Last page: ");
-    printitoa(last_allocated_block->unused_page->start_address, 10);
+    print_int_as_char(last_allocated_block->unused_page->start_address, 10);
   }
 
   return first_allocated_block;

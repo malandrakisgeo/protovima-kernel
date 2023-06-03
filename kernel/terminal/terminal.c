@@ -121,7 +121,8 @@ void receive_input(char ch)
         printchar(ch);
     }else if(ch == 24){ //arrow up
         show_previous_command(); //show the last command that ran successfully
-    }else if(ch == '\n'){
+    }else if(ch == '\n'){ //on enter
+        printchar('\n');
         find_and_run(command);
         clear_char_array(command);
         clear_char_array(args);

@@ -24,7 +24,7 @@
 #new way: 
 make clean
 make all 
-qemu-system-i386 -m 1000M -fda os.img
+qemu-system-i386 -m 500M -fda os.img
 
 #qemu-system-i386 -m 500M -machine type=pc-i440fx-3.1 -kernel os.img 
 
