@@ -98,16 +98,12 @@ void irq_handler(struct pushed_values* regs){
 }
 
 void isr_pushed(struct pushed_values* val){
-        printlnVGA("Interrupt received");
-    
+    printlnVGA("Interrupt received");
     char *str = exception_messages[val->int_no];
     printlnVGA(str);
-
     println_serious_error("Halting CPU");
     return;
-
 }
-
 
 
  void irq_install(){
@@ -126,9 +122,6 @@ void isr_pushed(struct pushed_values* val){
 
         return;
     }
-
-
-
 
 
 void isr_install(){
@@ -152,14 +145,10 @@ void isr_install(){
         return;
     }
 
-
-
 void irq_install_handler(unsigned int irq, void (*handler)(struct pushed_values *stk))
 {
 	irq_routines[irq] = handler;
 }
-
-
 
 
 __attribute__((noreturn))

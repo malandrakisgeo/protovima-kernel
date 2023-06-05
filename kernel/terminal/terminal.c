@@ -32,8 +32,6 @@ void show_previous_command(){
     return;
 }
 
-
-
 char* fetch_args(char inserted_chars[], int cmd_name_ending_position)
 {
     int i = cmd_name_ending_position, j = 0;
@@ -50,8 +48,8 @@ char* fetch_args(char inserted_chars[], int cmd_name_ending_position)
 void run_foreground_process(char * args)
 {
     if (foreground_process != 0){
-        pv_process pp = create_process((void*)foreground_process);
-        run_process(&pp, args);
+        pv_process proc = create_process((void*)foreground_process);
+        run_process(&proc, args);
     }
     return;
 }
@@ -112,7 +110,6 @@ void find_and_run(unsigned char * inserted_chars)
 }
 
 
-
 void receive_input(char ch)
 {
     if (ch != '\n' && ch != 24){ //newline or up
@@ -129,53 +126,6 @@ void receive_input(char ch)
     }
 }
 
-void sample_command()
-{
-    printlnVGA("Sample command ran!");
-    return;
-}
-
-void dample_command(char *ch)
-{
-    if (ch[0] != 0)
-    {
-        printlnVGA("You inserted the arguments: ");
-        printlnVGA(ch);
-    }
-    else
-    {
-        printlnVGA("No arguments inserted.");
-    }
-
-    return;
-}
-
-void malloc_command(char *size)
-{   
-    int rc = 0;
-    unsigned i = 1; //0 is a space
-    // C guarantees that '0'-'9' have consecutive values
-    while (size[i] != 0 && size[i] != '0x00')
-    {
-
-        if (size[i] >= 48 && size[i] <= 57)
-        {
-            rc *= 10;
-            rc += (size[i] - 48);
-        }
-        ++i;
-    }
-
-    malloc(rc, 0);
-
-    return;
-}
-
-void clear_terminal_command()
-{
-    clear();
-    return;
-}
 
 void register_commands()
 {
@@ -192,13 +142,13 @@ void register_commands()
     cmds[3].command_pointer = clear_terminal_command;
     cmds[4].name = "cpuinfo";
     cmds[4].command_pointer = cpu_info;
-
+    cmds[5].name = "infloop";
+    cmds[5].command_pointer = inf_loop;
 }
 
 /*
     It creates a struct that links command names to memory addresses.
 */
-
 void start_terminal()
 {
     register_commands();

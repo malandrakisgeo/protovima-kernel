@@ -19,7 +19,7 @@ typedef struct exec_image {
 
 
 
-typedef struct  pv_process{
+typedef struct pv_process{
     int pid;
     enum process_status status;
     //TODO: add files, threads, etc

@@ -16,8 +16,18 @@ pv_process create_process(void *code){
     return process;
 }
 
+void proc_init(){
+        //TODO
+}
+
+void process_manager(){
+    while(1){
+        //TODO
+
+    }
+}
+
 //TODO: Run via the scheduler
-//TODO: Push current cpu stacks
 void run_process(struct pv_process *proc, char args[]){
 
     if(current_proc){
@@ -27,9 +37,23 @@ void run_process(struct pv_process *proc, char args[]){
 
     current_proc->status = RUNNING;
 
-    typedef void func();
-    func *f = (func *) current_proc->image.text_address;
-    f(args);
+    typedef void function();
+
+    __asm__ __volatile__   ("pusha\n\t");
+
+    function *fun = (function *) current_proc->image.text_address;
+    fun(args);
+    current_proc = 0x0;
+    __asm__ __volatile__   ("popa\n\t");
+
     return;
 
+}
+
+void force_terminate(){
+    
+    current_proc = 0x0;
+    __asm__ __volatile__   ("popa\n\t");
+
+    return;
 }
