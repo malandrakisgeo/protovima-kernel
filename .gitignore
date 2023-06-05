@@ -2,6 +2,7 @@
 *.elf
 *.o
 *.buf
+*.out
 os.img 
 
 .vscode/
