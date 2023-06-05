@@ -1,32 +1,8 @@
-#old way:
-#rm *.bin  *.o  *.elf  disk.img os-image
 
-#nasm -g -f elf32 -F dwarf -o boot.o d.asm
-#ld -melf_i386 -Ttext=0x7c00 -nostdlib --nmagic -o boot.elf boot.o
-#objcopy -O binary boot.elf boot.bin
-
-#gcc -g -m32 -c -ffreestanding -o kernel.o kernel.c -lgcc
-#ld -melf_i386 -T linker.ld -nostdlib --nmagic -o kernel.elf kernel.o
-#objcopy -O binary kernel.elf kernel.bin
-
-
-
-#dd if=/dev/zero of=disk.img bs=512 count=2880  ##prosoxh sto dh 
-#dd if=boot.bin of=disk.img bs=512 conv=notrunc
-#dd if=kernel.bin of=disk.img bs=512 seek=1 conv=notrunc
-
-#qemu-system-i386  -smp 4  -m 50M,maxmem=50M disk.img
-
-#qemu-system-i386 -m 1G,maxmem=20030M -fda disk.img
-
---------------------------
-
-#new way: 
 make clean
 make all 
-qemu-system-i386 -m 500M -fda os.img
+qemu-system-i386  -m 100M -fda os.img
 
-#qemu-system-i386 -m 500M -machine type=pc-i440fx-3.1 -kernel os.img 
 
 
 

@@ -5,7 +5,6 @@ extern int foreground_process;
 extern int calling_foreground_process;
 
 
-
 char command[32];
 struct command_pointer cmds[32];
 char args[32];
@@ -191,6 +190,9 @@ void register_commands()
     cmds[2].command_pointer = malloc_command;
     cmds[3].name = "clear";
     cmds[3].command_pointer = clear_terminal_command;
+    cmds[4].name = "cpuinfo";
+    cmds[4].command_pointer = cpu_info;
+
 }
 
 /*

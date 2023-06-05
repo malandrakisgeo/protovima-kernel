@@ -1,6 +1,6 @@
 OUTPUT_FORMAT(elf32-i386)
 ENTRY(main)
-phys = 0xB000;
+phys = 0xA000;
 SECTIONS
 {
 	/*

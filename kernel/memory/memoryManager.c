@@ -23,11 +23,12 @@ static contiguous_mem_struct *next_free_page;
 
 void boot_memory_init()
 {
+  unsigned char *str; // for the int_to_char
+
 
   volatile int contiguous_memory_total_entries = 0;
   volatile unsigned long i, num;
 
-  unsigned char *str; // for the int_to_char
 
   myboot_param = (struct boot_param *)(E820_ADDRESS);
 

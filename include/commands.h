@@ -7,3 +7,4 @@ struct command_pointer{
 };
 
 void halt();
+void cpu_info();

@@ -1,6 +1,7 @@
 *.bin 
 *.elf
 *.o
+*.buf
 os.img 
 
 .vscode/

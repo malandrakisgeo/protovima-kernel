@@ -75,15 +75,12 @@ kernel.bin: kernel/kernel_entry.o kernel/cpu/interrupt_routines.o  ${OBJ}
 	#clang -target i386-pc-none-elf  -T linker.ld $^ -o  $@  -g3
 
 
-kernel.buf: ${OBJ2}
-	#gcc -m32 -ffreestanding -o kernel.buf kernel/kernel.c 
-	gcc -g -m32 -c -ffreestanding -o kernel.o kernel/kernel.c -lgcc
-	ld -melf_i386 -T kernel/linker.ld -nostdlib --nmagic -o kernel.buf kernel.o
-	#objcopy -O binary kernel.elf kernel.buf
+kernel.buf: kernel.elf
+	objcopy -O binary kernel.elf kernel.buf
 
 # Used for debugging purposes
 kernel.elf: kernel/kernel_entry.o kernel/cpu/interrupt_routines.o ${OBJ} 
-	ld -m elf_i386 -o $@ -Ttext 0x1000 $^
+	ld -m elf_i386 -o $@ -Ttext 0xA000 $^
 
 # Assemble the boot sector to raw machine code
 # The -I options tells nasm where to find our useful assembly
@@ -95,7 +92,7 @@ boot_sect.bin: ./boot/d.asm
 
 # This is the actual disk image that the computer loads ,
 # which is the combination of our compiled bootsector and kernel
-os.img: boot_sect.bin  kernel.bin 
+os.img: boot_sect.bin  kernel.buf 
 	cat $^ > $@
 
 all: os.img
