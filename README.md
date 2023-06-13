@@ -8,7 +8,7 @@ Meant to run on any single-core CPU with an i386 architecture.
 
 ==========================
 
-*DISCLAIMER*:
+**DISCLAIMER**: <br />
 C is not my cup of tea, so be prepared for some weird code here.
 
 
@@ -38,13 +38,13 @@ https://github.com/vitaminac/minios
 
 ###  OS programming resources: 
 
-osdev.org 
-lowlevel.eu 
-jamesmolloy.co.uk 
-reddit.com/r/osdev/
-https://os.phil-opp.com
-
-Operating System Concepts - Silberschatz-Gagne-Galvin
-Modern Operating Systems - Tanenbaum (The MINIX book)
+osdev.org
+<br />lowlevel.eu
+<br />jamesmolloy.co.uk
+<br />reddit.com/r/osdev/
+<br />https://os.phil-opp.com
+<br />
+<br />Operating System Concepts - Silberschatz-Gagne-Galvin
+<br />Modern Operating Systems - Tanenbaum (The MINIX book)
 
 ==========================
