@@ -1,0 +1,27 @@
+Protovima: "First step" in Greek (πρώτο βήμα)
+
+---------------------------------------------------------------------------------------------------
+Running "readelf -l -W kernel.elf" should show something like this:
+
+
+Elf file type is EXEC (Executable file)
+Entry point 0xa000
+There are 5 program headers, starting at offset 52
+
+Program Headers:
+  Type           Offset   VirtAddr   PhysAddr   FileSiz MemSiz  Flg Align
+  LOAD           0x000000 0x00009000 0x00009000 0x000d4 0x000d4 R   0x1000
+  LOAD           0x001000 0x0000a000 0x0000a000 0x01e58 0x01e58 R E 0x1000
+  LOAD           0x003000 0x0000c000 0x0000c000 0x00c30 0x00c30 R   0x1000
+  LOAD           0x004000 0x0000e000 0x0000e000 0x001a0 0x01cd0 RW  0x1000
+  GNU_STACK      0x000000 0x00000000 0x00000000 0x00000 0x00000 RWE 0x10
+
+ Section to Segment mapping:
+  Segment Sections...
+   00     
+   01     .text 
+   02     .rodata .eh_frame 
+   03     .data .bss 
+   04     
+ 
+----------------------------------------------------------------------------------------------------

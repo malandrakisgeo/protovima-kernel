@@ -256,23 +256,24 @@ irq_common_stub:
 	sti
 	iretd
 
-; 32: IRQ0
-irq0:
-	cld
+
+; 32: IRQ0 (Timer)
+irq0: 
+	cli
 	push byte 0
 	push byte 32
 	jmp irq_common_stub
 	ret;
     
- ; 33: IRQ1 
+ ; 33: IRQ1 (Keyboard)
 irq1:
-	cld
+	cli
 	push byte 0
 	push  byte 33
 	jmp irq_common_stub
 	ret;
 
-; 34: IRQ2
+; 34: IRQ2 (PIC cascading)
 irq2:
 	cli
 	push byte 0
@@ -316,7 +317,7 @@ _irq7:
 	push 39
 	jmp irq_common_stub
 	
-; 40: IRQ8	
+; 40: IRQ8	(System clock)
 _irq8:
 	cli
 	push 0
@@ -330,7 +331,7 @@ _irq9:
 	push 41
 	jmp irq_common_stub
 	
-; 42: IRQ10	
+; 42: IRQ10	(Network interface)
 _irq10:
 	cli
 	push 0
@@ -344,7 +345,7 @@ _irq11:
 	push 43
 	jmp irq_common_stub
 	
-; 44: IRQ12
+; 44: IRQ12 (PS/2 mouse)
 _irq12:
 	cli
 	push 0

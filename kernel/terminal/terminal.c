@@ -44,14 +44,20 @@ char* fetch_args(char inserted_chars[], int cmd_name_ending_position)
     return args;
 }
 
-//Calls a function pointer with an array of arguments
-void run_foreground_process(char * args)
+char *terminal_char_append(char dest[], char src)
 {
-    if (foreground_process != 0){
-        pv_process proc = create_process((void*)foreground_process);
-        run_process(&proc, args);
-    }
-    return;
+   int i = 0, j = 0;
+   while (dest[i] != 0 && dest[i] != '0x00')
+      ++i;
+
+   if(src != '\b'){ //backspace
+         dest[i] = src;
+   }else{
+      dest[--i] = 0x00;
+   }
+
+   //dest[++i] = '\0';
+   return dest;
 }
 
 /*
@@ -148,14 +154,22 @@ void register_commands()
 
 /*
     It creates a struct that links command names to memory addresses.
+    This is meant to be run directly, without setting up the process management.
 */
-void start_terminal()
+void start_terminal_independently()
 {
     register_commands();
 
     void (*r_input)(char) = receive_input; //function pointer
     foreground_process = (int )r_input;
+    
     printlnVGA("TERMINAL RUNNING!");
     printchar('>');
 }
 
+void start_terminal_proc()
+{
+    register_commands();
+    printlnVGA("TERMINAL RUNNING!");
+    printchar('>');
+}

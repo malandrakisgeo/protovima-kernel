@@ -36,6 +36,7 @@ typedef unsigned long long ulong64;
 
 #define current_page_table_size 1024
 
+#define max_procs 8
 
 
 

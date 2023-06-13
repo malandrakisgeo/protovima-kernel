@@ -1,6 +1,5 @@
 char *concat(char dest[], char src[]);
 char *char_append1(char dest[], char src);
-char *terminal_char_append(char dest[], char src);
 
 char *clear_char_array(char *dest);
 

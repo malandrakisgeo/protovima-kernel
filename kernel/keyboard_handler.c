@@ -13,8 +13,6 @@ void send_to_foreground_process(char ch){
     }
 }
 
-
-
 void show_received_char(int char_pos){
 
     char str = keyboard_map[char_pos];
@@ -23,8 +21,6 @@ void show_received_char(int char_pos){
     }else{
         send_to_foreground_process(str);
     }
-    
-
 }
 
 void general_keyboard_handler(unsigned int scancode){

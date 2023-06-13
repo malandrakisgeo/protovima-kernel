@@ -80,8 +80,8 @@ kernel.out: kernel.elf
 
 # Used for debugging purposes
 kernel.elf: kernel/kernel_entry.o kernel/cpu/interrupt_routines.o ${OBJ} 
-	#ld -m elf_i386 -o $@ -Ttext 0xA000 $^
-	ld -m elf_i386 -o $@ -T linker.ld $^
+	ld -m elf_i386 -o $@ -Ttext 0xA000 $^
+	#ld -m elf_i386 -o $@ -T linker.ld $^
 
 
 # Assemble the boot sector to raw machine code

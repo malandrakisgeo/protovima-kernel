@@ -23,21 +23,7 @@ char *char_append1(char dest[], char src)
    return dest;
 }
 
-char *terminal_char_append(char dest[], char src)
-{
-   int i = 0, j = 0;
-   while (dest[i] != 0 && dest[i] != '0x00')
-      ++i;
 
-   if(src != '\b'){ //backspace
-         dest[i] = src;
-   }else{
-      dest[--i] = 0x00;
-   }
-
-   //dest[++i] = '\0';
-   return dest;
-}
 
 char *clear_char_array(char *dest)
 {
