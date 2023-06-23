@@ -2,5 +2,5 @@
 
 
 void init_timer( int frequency);
-void timer_handler();
+void run_periodically();
 

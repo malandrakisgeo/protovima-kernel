@@ -1,5 +1,7 @@
 #include "terminal.h"
 #include "vgaTextUtility.h"
+#include "process.h"
+#include "commands.h"
 
 extern int foreground_process;
 extern int calling_foreground_process;
@@ -8,11 +10,10 @@ extern int calling_foreground_process;
 char command[32];
 struct command_pointer cmds[32];
 char args[32];
-char previous_command;
+char  previous_command;
 int previous_command_pointer=0;
 int command_history=0;
 static int inexistent_command =0 ;
-
 void command_history_handler(){
     deepcopy_char_array(command, previous_command);
    
@@ -70,7 +71,7 @@ char *terminal_char_append(char dest[], char src)
 
     TODO: Learn better C and find a less retarded way to achieve this
 */
-void find_and_run(unsigned char * inserted_chars)
+void find_and_create_process(unsigned char * inserted_chars)
 {
      
     int j, i;
@@ -94,16 +95,16 @@ void find_and_run(unsigned char * inserted_chars)
             j++;
         }
 
-        if (inexistent_command == 0)
-        { //if command found
+
+         if (inexistent_command == 0)
+        {
+
             void (*cmd)() = cmds[i].command_pointer;         //find the function pointer to the command
-            calling_foreground_process = foreground_process; //store the address of the terminal for returning
-            foreground_process = cmd;                        //and bring the command to the foreground.
-  
             char *args = fetch_args(inserted_chars, j);      //get the arguments after the command
-            run_foreground_process(args);                    //and call the command with them
-            foreground_process = calling_foreground_process; //return to terminal
+
+            create_process(cmd, args);
             command_history_handler();
+
             previous_command_pointer=0;
             return;
         }
@@ -123,13 +124,17 @@ void receive_input(char ch)
         printchar(ch);
     }else if(ch == 24){ //arrow up
         show_previous_command(); //show the last command that ran successfully
+
     }else if(ch == '\n'){ //on enter
         printchar('\n');
-        find_and_run(command);
+            __asm__ __volatile__   ("cli\n\t");
+        find_and_create_process(command);
         clear_char_array(command);
         clear_char_array(args);
+        __asm__ __volatile__   ("sti\n\t");
         printchar('>');
     }
+
 }
 
 
@@ -150,7 +155,11 @@ void register_commands()
     cmds[4].command_pointer = cpu_info;
     cmds[5].name = "infloop";
     cmds[5].command_pointer = inf_loop;
+    cmds[6].name = "showval";
+    cmds[6].command_pointer = showval;
 }
+
+
 
 /*
     It creates a struct that links command names to memory addresses.

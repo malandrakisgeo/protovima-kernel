@@ -8,5 +8,9 @@ struct command_pointer{
 
 void halt();
 void cpu_info();
+void charprint();
+void charprint();
+
+void showval();
 
 void inf_loop();

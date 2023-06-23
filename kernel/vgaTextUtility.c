@@ -87,9 +87,11 @@ void printlnVGA(unsigned char *msg)
 
 void print_int_as_char(long i, int base)
 {
+
   unsigned char *str;
   str = int_to_char(i, str, base);
   printlnVGA(str);
+
   return;
 }
 

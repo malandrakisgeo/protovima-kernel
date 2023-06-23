@@ -48,6 +48,7 @@ char *deepcopy_char_array(char src[], char dest[])
    return dest;
 }
 
+
 //The cursor is already disabled via a BIOS function, but perhaps I'll switch to this method someday
 void disable_cursor()
 {
@@ -94,4 +95,16 @@ unsigned char *int_to_char(unsigned long value, unsigned char *str, unsigned int
     *ptr-- = tmp;
   }
   return rc;
+}
+
+int is_empty(char inserted_chars[], int run_until)
+{
+    int i =0, j = 0;
+
+    while (i<run_until && inserted_chars[i++] != 0)
+    {
+        ++j;
+    }
+
+    return j;
 }

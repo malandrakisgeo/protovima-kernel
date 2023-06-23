@@ -19,7 +19,7 @@
 
 int foreground_process = 0; //the address of the process currently appearing -either for receiving input, or for printing it.
 int calling_foreground_process = 0;
-
+volatile long val = 0;
 void main()
 {
     init_vga(WHITE, BLACK);
@@ -37,13 +37,15 @@ void main()
     initialize_idt();
     isr_install();
     irq_install();
-    init_timer(10); //10Hz
     initialize_paging();
 
     // int l = 1/0; //test for division-by-zero exception
 
     //start_terminal_independently();
     proc_init();
+    
+    init_timer(1); //5Hz
+
     while (1)
         __asm__("hlt\n\t");
 }

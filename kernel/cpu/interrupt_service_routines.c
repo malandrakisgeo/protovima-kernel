@@ -84,7 +84,7 @@ const char* exception_messages[] =
 // This gets called from our ASM interrupt handler stub. Jamesmolloy.co.uk.
 void irq_handler(struct pushed_values* regs){
 	// print_int_as_char(regs->int_no, 10);
-
+	//queue_current_process();
 	if(regs->int_no < 32 ){
 		printlnVGA("IRQ handled");
 		char *str = exception_messages[regs->int_no];
@@ -93,8 +93,10 @@ void irq_handler(struct pushed_values* regs){
 	}
 
 	if(regs->int_no == 32){
-		timer_handler();
 		inb(0x60);
+
+		run_periodically();
+		return; //The interrupts are reenabled via 0x20 in the run_periodically later.
 	}
 
 	if(regs->int_no == 33){
@@ -203,5 +205,5 @@ void irq_install_handler(unsigned int irq, void (*handler)(struct pushed_values 
 __attribute__((noreturn))
 void exception_handler(void);
 void exception_handler() {
-    __asm__ volatile ("cli; hlt"); // Completely hangs the computer
+    //__asm__ volatile ("cli; hlt"); // Completely hangs the computer
 }

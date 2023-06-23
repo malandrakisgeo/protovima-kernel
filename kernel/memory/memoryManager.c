@@ -152,6 +152,7 @@ void *page_alloc()
   page_entry_to_be_used->next->unused_page = NULL;
 
   return page_entry_to_be_used; // prev. page_entry_to_be_used->unused_page
+
 }
 
 /*
@@ -165,6 +166,7 @@ void *page_alloc()
 */
 volatile void *malloc(long size_in_bytes, int called_by_process)
 {
+    __asm__ __volatile__   ("cli\n\t");
 
   if (available_unpaged_memory < size_in_bytes)
   {
@@ -212,6 +214,7 @@ volatile void *malloc(long size_in_bytes, int called_by_process)
     printlnVGA("Last page: ");
     print_int_as_char(last_allocated_block->unused_page->start_address, 10);
   }
+      __asm__ __volatile__   ("sti\n\t");
 
   return first_allocated_block;
 }

@@ -16,7 +16,7 @@ void register_isr_handler(int n, unsigned int handler_address){
         idt[n].isr_high = (handler_address >> 16) & 0xFFFF ; //higher 16 address
         idt[n].isr_low = handler_address & 0xFFFF; //lower 16 address
         idt[n].reserved = 0;
-        idt[n].attributes = 0xEE; 
+        idt[n].attributes = 0x8E; 
     }
 }
 
