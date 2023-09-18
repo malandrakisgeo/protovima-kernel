@@ -26,6 +26,16 @@ qemu-system-i386 -m 500M -fda os.img
 
 ==========================
 
+###  Protovima in action: 
+
+![](./inAction1.jpg)
+
+![](./inAction2.jpg)
+
+![](./inAction3.jpg)
+
+==========================
+
 Bootloader&Makefile largely based on::
 
 https://dev.to/frosnerd/writing-my-own-boot-loader-3mld
